@@ -1,5 +1,9 @@
 # IITG 3D
 
+## ▶ [Play it now, online: no download, no setup](https://claude.ai/artifact/XTPN49amJGjd9xE2xgMJFS)
+
+Click the link and the game opens in your browser (on claude.ai). Use desktop Chrome or Edge for the best result; a phone or tablet works too, with an on-screen joystick. The online copy cannot show the films, YouTube or real websites on the in-game screens and PCs (and may not allow screen sharing): for those, run it on your own computer (see [Play](#play) below).
+
 **An explorable, living IIT Guwahati campus**, rebuilt in 3D from open map, elevation and satellite data.
 Walk out of your hostel, queue for lunch in the mess, sit in a lecture, swim in the pool, cycle round the lakes, ride the campus bus, fly a drone over the Brahmaputra. About 3,000 simulated students, staff and families follow a real day: classes, meals, sport, clubs, events and night life.
 
@@ -13,6 +17,7 @@ Walk out of your hostel, queue for lunch in the mess, sit in a lecture, swim in 
 
 | How | What to do |
 |---|---|
+| **Online, nothing to install** | Open **[the online copy](https://claude.ai/artifact/XTPN49amJGjd9xE2xgMJFS)**. Almost everything works; the films, YouTube and real websites on the in-game screens do not (the page it runs in does not allow them), and the presenter PC's Present / share screen may not either. Your progress is saved in that browser. |
 | **Windows, everything working** | Double-click **`launch.bat`**. It starts a small local server (needs [Node.js](https://nodejs.org)) and opens the game at `http://localhost:8871/`. Keep its small window open while you play. |
 | **Any computer** | Open **`dist/IITG_Campus_3D.html`** in Chrome or Edge (the browsers it is tested in; Firefox and Safari should work but are not tested). It is one file and works offline. |
 | **Any computer, with the web features** | `node tools/serve.mjs --open` |
