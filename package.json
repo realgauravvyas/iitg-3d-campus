@@ -1,0 +1,27 @@
+{
+  "name": "iitg-3d",
+  "version": "4.0.0",
+  "private": true,
+  "description": "An explorable, living IIT Guwahati campus in 3D, built from open map data. An unofficial fan project.",
+  "author": "Gaurav Vyas",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "build:dev": "node tools/build.mjs --dev",
+    "serve": "node tools/serve.mjs --open",
+    "features": "node tools/gen-features.mjs",
+    "test": "node tools/qa/all.mjs",
+    "test:unit": "node tools/qa/unit.mjs",
+    "test:play": "node tools/qa/run.mjs",
+    "screenshots": "node tools/qa/screenshots.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "puppeteer-core": "^25.12.0",
+    "three": "^0.186.1"
+  }
+}

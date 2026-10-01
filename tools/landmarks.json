@@ -1,0 +1,447 @@
+{
+  "_note": "Curated tour landmarks. 'match' is the exact OSM/Overture name used to locate it; positions always come from the map data, never typed by hand. Descriptions are short and factual.",
+  "landmarks": [
+    {
+      "id": "admin",
+      "match": "Administrative Block",
+      "name": "Administrative Building",
+      "kind": "admin",
+      "desc": "Houses the Director's office, the Deans and the institute's administrative sections."
+    },
+    {
+      "id": "auditorium",
+      "match": "Bhupen Hazarika Auditorium",
+      "name": "Dr. Bhupen Hazarika Auditorium",
+      "kind": "culture",
+      "desc": "The main auditorium, named after Dr. Bhupen Hazarika, the legendary Assamese singer, lyricist and film-maker. Convocations, talks and cultural nights happen here."
+    },
+    {
+      "id": "conference",
+      "match": "Conference Hall",
+      "name": "Conference Centre",
+      "kind": "academic",
+      "desc": "Conference and seminar halls next to the auditorium."
+    },
+    {
+      "id": "library",
+      "match": "Central Library and Computer Center",
+      "source": "overture",
+      "name": "Central Library",
+      "kind": "academic",
+      "desc": "Lakshminath Bezbaroa Central Library, with the Computer Centre alongside. The favourite place to study in exam season."
+    },
+    {
+      "id": "lhc",
+      "match": "Lecture Halls",
+      "name": "Lecture Hall Complex",
+      "kind": "academic",
+      "desc": "The big lecture theatres where first-year and institute-wide courses are taught. Look for the LH canteen nearby."
+    },
+    {
+      "id": "academic",
+      "match": "Academic Complex",
+      "name": "Academic Complex",
+      "kind": "academic",
+      "desc": "The heart of academics: interconnected blocks (the Cores) holding most departments, labs and faculty offices."
+    },
+    {
+      "id": "core5",
+      "match": "Core 5",
+      "name": "Core 5",
+      "kind": "academic",
+      "desc": "One of the academic core blocks at the western edge of the Academic Complex."
+    },
+    {
+      "id": "workshop",
+      "match": "Mechnical Workshop",
+      "name": "Mechanical Workshop",
+      "kind": "academic",
+      "desc": "Central workshop where first-years learn machining, welding and fabrication."
+    },
+    {
+      "id": "lake",
+      "match": "IITG lake",
+      "name": "IITG Lake",
+      "kind": "nature",
+      "desc": "One of the many lakes that make IITG one of the greenest campuses in India. The lakeside is a favourite evening walk."
+    },
+    {
+      "id": "foodstalls",
+      "match": "Food stalls place",
+      "name": "Lakeside Food Stalls",
+      "kind": "food",
+      "desc": "Evening food stalls by the lake."
+    },
+    {
+      "id": "sac",
+      "match": "Student Activity Center",
+      "name": "Student Activity Centre",
+      "kind": "sports",
+      "desc": "Club rooms and activity spaces for the student Gymkhana: music, dance, drama, photography and more."
+    },
+    {
+      "id": "newsac",
+      "match": "New Student Activity Center",
+      "name": "New SAC",
+      "kind": "sports",
+      "desc": "The newer Student Activity Centre, with more halls for clubs and fest preparation."
+    },
+    {
+      "id": "athletics",
+      "match": "athletics",
+      "name": "Athletics Track & Football Ground",
+      "kind": "sports",
+      "desc": "The main sports ground with a running track. Inter-hostel sports and Spirit events happen here."
+    },
+    {
+      "id": "pool",
+      "match": "Swimming Pool IITG",
+      "source": "overture",
+      "name": "Swimming Pool",
+      "kind": "sports",
+      "desc": "The institute swimming pool in the sports complex."
+    },
+    {
+      "id": "gym",
+      "match": "General Gym",
+      "name": "General Gym",
+      "kind": "sports",
+      "desc": "The institute gymnasium."
+    },
+    {
+      "id": "khokha",
+      "match": "Khoka Market",
+      "source": "overture",
+      "name": "Khokha Market",
+      "kind": "food",
+      "desc": "Tea stalls, maggi and snacks. The classic late-night hangout for hostel residents."
+    },
+    {
+      "id": "hospital",
+      "match": "IITG Hospital",
+      "name": "IITG Hospital",
+      "kind": "service",
+      "desc": "The campus hospital for students, staff and their families."
+    },
+    {
+      "id": "guesthouse",
+      "match": "Guest House",
+      "name": "Guest House",
+      "kind": "service",
+      "desc": "The institute guest house, beside the lake near the northern part of campus."
+    },
+    {
+      "id": "serpentine",
+      "match": "Serpentine",
+      "name": "Serpentine Lake",
+      "kind": "nature",
+      "desc": "The largest lake on campus, winding through the green north-west of IITG."
+    },
+    {
+      "id": "shopping",
+      "match": "Shopping Complex",
+      "name": "Market Complex",
+      "kind": "food",
+      "desc": "Shops, banks and eateries for daily needs."
+    },
+    {
+      "id": "foodcourt",
+      "match": "Food Court",
+      "name": "Food Court",
+      "kind": "food",
+      "desc": "Food court near the sports complex."
+    },
+    {
+      "id": "transit",
+      "match": "Transit Complex",
+      "name": "Transit Complex",
+      "kind": "residential",
+      "desc": "Transit accommodation on the eastern side of campus."
+    },
+    {
+      "id": "tic",
+      "match": "Technology Incubation Center - IIT Guwahati",
+      "source": "overture",
+      "name": "Technology Incubation Centre",
+      "kind": "academic",
+      "desc": "Where start-ups born at IIT Guwahati are incubated."
+    },
+    {
+      "id": "cricket",
+      "at": [
+        282,
+        101
+      ],
+      "name": "Cricket Ground",
+      "kind": "sports",
+      "desc": "The campus cricket ground: inter-hostel matches, and the open-air concert stage for the Techniche and Alcheringa Pronites."
+    },
+    {
+      "id": "childpark",
+      "match": "Children's Park",
+      "name": "Children's Park",
+      "kind": "nature",
+      "desc": "Park for the kids of the campus residential area."
+    },
+    {
+      "id": "viewpoint",
+      "tag": "tourism=viewpoint",
+      "name": "View Point",
+      "kind": "nature",
+      "desc": "A lookout on the hill. On a clear day you can see across the campus lakes to the Brahmaputra valley. Best at sunset."
+    },
+    {
+      "id": "brahmaputra",
+      "match": "Brahmaputra Hostel",
+      "name": "Brahmaputra Hostel",
+      "kind": "hostel",
+      "desc": "Named after the Brahmaputra, the great river flowing just south of campus. Every IITG hostel is named after a river of the Northeast."
+    },
+    {
+      "id": "lohit",
+      "match": "Lohit Hostel",
+      "name": "Lohit Hostel",
+      "kind": "hostel",
+      "desc": "Named after the Lohit river of Arunachal Pradesh and Assam."
+    },
+    {
+      "id": "dihing",
+      "match": "Dihing Hostel",
+      "name": "Dihing Hostel",
+      "kind": "hostel",
+      "desc": "Named after the Dihing, a tributary of the Brahmaputra."
+    },
+    {
+      "id": "manas",
+      "match": "Manas Hostel",
+      "name": "Manas Hostel",
+      "kind": "hostel",
+      "desc": "Named after the Manas river, which flows from Bhutan through the Manas National Park."
+    },
+    {
+      "id": "umiam",
+      "match": "Umiam Hostel",
+      "name": "Umiam Hostel",
+      "kind": "hostel",
+      "desc": "Named after the Umiam river of Meghalaya."
+    },
+    {
+      "id": "barak",
+      "match": "Barak Hostel",
+      "name": "Barak Hostel",
+      "kind": "hostel",
+      "desc": "Named after the Barak, the major river of southern Assam."
+    },
+    {
+      "id": "kameng",
+      "match": "Kameng Hostel",
+      "name": "Kameng Hostel",
+      "kind": "hostel",
+      "desc": "Named after the Kameng river of Arunachal Pradesh."
+    },
+    {
+      "id": "gaurang",
+      "match": "Gaurang Hostel",
+      "name": "Gaurang Hostel",
+      "kind": "hostel",
+      "desc": "One of the newer hostels, named after the Gaurang river of western Assam."
+    },
+    {
+      "id": "siang",
+      "match": "Siang Hostel",
+      "name": "Siang Hostel",
+      "kind": "hostel",
+      "desc": "Named after the Siang, as the Brahmaputra is called in Arunachal Pradesh."
+    },
+    {
+      "id": "kapili",
+      "match": "Kapili Hostel",
+      "name": "Kapili Hostel",
+      "kind": "hostel",
+      "desc": "Named after the Kapili river of Assam and Meghalaya."
+    },
+    {
+      "id": "dibang",
+      "match": "Dibang Hostel",
+      "name": "Dibang Hostel",
+      "kind": "hostel",
+      "desc": "Named after the Dibang river of Arunachal Pradesh."
+    },
+    {
+      "id": "disang",
+      "match": "Disang Hostel",
+      "name": "Disang Hostel",
+      "kind": "hostel",
+      "desc": "Girls' hostel, named after the Disang river, a tributary of the Brahmaputra."
+    },
+    {
+      "id": "subansiri",
+      "match": "Subansiri Hostel",
+      "name": "Subansiri Hostel",
+      "kind": "hostel",
+      "desc": "Girls' hostel, named after the Subansiri, the largest tributary of the Brahmaputra."
+    },
+    {
+      "id": "dhansiri",
+      "match": "Dhansiri Hostel",
+      "name": "Dhansiri Hostel",
+      "kind": "hostel",
+      "desc": "Girls' hostel, named after the Dhansiri river of Assam and Nagaland."
+    },
+    {
+      "id": "msh",
+      "match": "Married Scholars Hostel",
+      "name": "Married Scholars Hostel",
+      "kind": "hostel",
+      "desc": "Accommodation for married research scholars."
+    },
+    {
+      "id": "techpark",
+      "at": [
+        785,
+        556
+      ],
+      "name": "Technology Park",
+      "kind": "academic",
+      "desc": "The research park on the former east cricket ground: start-ups and industry labs in a cluster of new buildings around a plaza, next to the Technology Incubation Centre."
+    },
+    {
+      "id": "busstop",
+      "at": [
+        785,
+        507
+      ],
+      "name": "IITG Bus Stop",
+      "kind": "service",
+      "desc": "The bus terminus: every campus bus starts here, in its bays between the Technology Incubation Centre and the Technology Park, and runs the loop round the campus."
+    }
+  ],
+  "pois": [
+    {
+      "match": "Department of Chemistry, IIT Guwahati",
+      "name": "Dept. of Chemistry",
+      "kind": "dept"
+    },
+    {
+      "match": "Department of Mathematics",
+      "name": "Dept. of Mathematics",
+      "kind": "dept"
+    },
+    {
+      "match": "Department of Design",
+      "name": "Dept. of Design",
+      "kind": "dept"
+    },
+    {
+      "match": "Department of Humanities and Social Sciences",
+      "name": "Dept. of HSS",
+      "kind": "dept"
+    },
+    {
+      "match": "Department of Physics, IIT Guwahati",
+      "name": "Dept. of Physics",
+      "kind": "dept"
+    },
+    {
+      "match": "Department of Mechanical Engineering, IIT Guwahati",
+      "name": "Dept. of Mechanical Engg.",
+      "kind": "dept"
+    },
+    {
+      "match": "School of Energy Science and Engineering, IIT Guwahati",
+      "name": "School of Energy Science & Engg.",
+      "kind": "dept"
+    },
+    {
+      "at": [356, 262],
+      "match": "Basketball Court",
+      "name": "Basketball Courts",
+      "kind": "sports"
+    },
+    {
+      "match": "Volleyball Courts",
+      "name": "Volleyball Courts",
+      "kind": "sports"
+    },
+    {
+      "match": "Siang Canteen",
+      "name": "Siang Canteen",
+      "kind": "food"
+    },
+    {
+      "match": "Lecture hall canteen",
+      "name": "LH Canteen",
+      "kind": "food"
+    },
+    {
+      "match": "Cafe Coffee Day",
+      "name": "Cafe Coffee Day",
+      "kind": "food"
+    },
+    {
+      "match": "Tapri",
+      "name": "Lake View Tea Stall",
+      "kind": "food"
+    },
+    {
+      "match": "Subway",
+      "name": "Subway",
+      "kind": "food"
+    },
+    {
+      "match": "Baskin Robbins",
+      "name": "Baskin Robbins",
+      "kind": "food"
+    },
+    {
+      "match": "Foodie's World",
+      "name": "Foodie's World",
+      "kind": "food"
+    },
+    {
+      "match": "Manikanta Restraunt",
+      "name": "Manikanta Restaurant",
+      "kind": "food"
+    },
+    {
+      "match": "State Bank of India",
+      "name": "SBI",
+      "kind": "service"
+    },
+    {
+      "match": "Canara Bank",
+      "name": "Canara Bank",
+      "kind": "service"
+    },
+    {
+      "match": "Cycle repair shop",
+      "name": "Cycle Repair Shop",
+      "kind": "service"
+    },
+    {
+      "match": "Computer centre",
+      "name": "Computer Centre",
+      "kind": "academic"
+    },
+    {
+      "match": "Center for Educational Technology",
+      "name": "Centre for Educational Technology",
+      "kind": "academic"
+    },
+    {
+      "match": "Planning and Management Section",
+      "name": "Planning & Management",
+      "kind": "admin"
+    },
+    {
+      "match": "Lake opposite guest house",
+      "name": "Guest House Lake",
+      "kind": "nature"
+    },
+    {
+      "match": "IIT to PB firststop",
+      "name": "Campus Bus Stop",
+      "kind": "bus"
+    }
+  ]
+}

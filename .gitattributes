@@ -1,0 +1,15 @@
+# normalise line endings; Windows batch files must stay CRLF
+* text=auto
+*.bat text eol=crlf
+*.sh text eol=lf
+
+# generated or bulky files: keep them out of diffs and out of GitHub's language statistics
+dist/*.html linguist-generated=true -diff
+data/campus.json linguist-generated=true -diff
+data/raw/** linguist-vendored=true -diff
+FEATURES.md linguist-generated=true
+tools/qa/steps.json linguist-generated=false
+
+# binary
+*.jpg binary
+*.png binary

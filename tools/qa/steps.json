@@ -1,0 +1,1287 @@
+[
+  {
+    "name": "01 start walking, objective",
+    "do": "",
+    "wait": 1500,
+    "check": "[window.__game.mode, !document.getElementById('objective').hidden]",
+    "expect": "walk.*true"
+  },
+  {
+    "name": "02 dawn 6:00",
+    "do": "window.__game.clock.set(6)",
+    "wait": 2500,
+    "check": "[window.__game.life.stats().trav, window.__game.crowd.drawn]"
+  },
+  {
+    "name": "03 class rush 8:40",
+    "do": "window.__game.clock.set(8.66)",
+    "wait": 2500,
+    "check": "[window.__game.life.stats().trav, window.__game.street.visible, window.__game.commute.visible]"
+  },
+  {
+    "name": "04 lunch 12:40",
+    "do": "window.__game.clock.set(12.66)",
+    "wait": 2500,
+    "check": "window.__game.life.stats()"
+  },
+  {
+    "name": "05 evening 17:40",
+    "do": "window.__game.clock.set(17.66)",
+    "wait": 2500,
+    "check": "window.__game.sports.slots.filter(s=>s.game).length"
+  },
+  {
+    "name": "06 night 21:00",
+    "do": "window.__game.clock.set(21)",
+    "wait": 2500,
+    "check": "[window.__game.hood.glowMat.opacity.toFixed(2), window.__game.life.people.filter(p=>p.partner && p.state==='travel').length]"
+  },
+  {
+    "name": "07 2 am",
+    "do": "window.__game.clock.set(2.2)",
+    "wait": 2500,
+    "check": "window.__game.life.stats()"
+  },
+  {
+    "name": "08 back to 10 am",
+    "do": "window.__game.clock.set(10)",
+    "wait": 1500,
+    "check": "window.__game.clock.hour.toFixed(1)"
+  },
+  {
+    "name": "09 bicycle on/off",
+    "do": "window.__game.setMode('bike')",
+    "wait": 800,
+    "check": "[window.__game.mode, window.__game.bike.riding]",
+    "expect": "bike.*true"
+  },
+  {
+    "name": "10 bicycle off",
+    "do": "window.__game.setMode('walk')",
+    "wait": 500,
+    "check": "[window.__game.mode, window.__game.bike.riding]",
+    "expect": "walk.*false"
+  },
+  {
+    "name": "11 bus tour",
+    "do": "window.__game.startTour('bus')",
+    "wait": 2500,
+    "check": "[window.__game.mode, window.__game.busTour.active]",
+    "expect": "bus.*true"
+  },
+  {
+    "name": "12 bus skip",
+    "do": "window.__game.busTour.skip(); window.__game.busTour.speedMul = 4",
+    "wait": 2000,
+    "check": "[window.__game.busTour.state, Math.round(window.__game.busTour.v)]"
+  },
+  {
+    "name": "13 bus off",
+    "do": "window.__game.setMode('walk')",
+    "wait": 600,
+    "check": "window.__game.mode",
+    "expect": "walk"
+  },
+  {
+    "name": "14 walking tour",
+    "do": "window.__game.startTour('walk'); window.__game.tour.speedIx.walk = 5; setTimeout(() => window.__game.tour.skip(), 400)",
+    "wait": 3000,
+    "check": "[window.__game.mode, window.__game.tour.kind, Math.round(window.__game.tour.v)]",
+    "expect": "tour"
+  },
+  {
+    "name": "15 cycle tour",
+    "do": "window.__game.setMode('walk'); window.__game.startTour('bike'); setTimeout(() => window.__game.tour.skip(), 400)",
+    "wait": 2500,
+    "check": "[window.__game.mode, window.__game.tour.kind]",
+    "expect": "bike"
+  },
+  {
+    "name": "16 drone tour",
+    "do": "window.__game.setMode('walk'); window.__game.startTour('drone'); setTimeout(() => window.__game.tour.skip(), 400)",
+    "wait": 2500,
+    "check": "(() => { const g=window.__game; return [g.mode, g.tour.kind, +(g.player.pos.y - g.world.groundAt(g.player.pos.x, g.player.pos.z, g.player.pos.y+0.5)).toFixed(2)]; })()",
+    "expect": "drone"
+  },
+  {
+    "name": "17 drone mode, pilot grounded",
+    "do": "window.__game.setMode('walk'); window.__game.player.flying = true; window.__game.player.pos.y += 30; window.__game.setMode('drone')",
+    "wait": 1500,
+    "check": "(() => { const g=window.__game; return [g.mode, +(g.player.pos.y - g.world.groundAt(g.player.pos.x, g.player.pos.z, g.player.pos.y+0.5)).toFixed(2)]; })()",
+    "expect": "drone.*0"
+  },
+  {
+    "name": "18 camera + filter + photo",
+    "do": "window.__game.drone.finish(); window.__game.setMode('walk'); window.__game.setMode('camera'); window.__game.photoFilter = 'film'; window.__game.capture.snap('qa')",
+    "wait": 1500,
+    "check": "[window.__game.mode, window.__game.capture.session.length > 0]",
+    "expect": "camera.*true"
+  },
+  {
+    "name": "19 own hostel interior",
+    "do": "window.__game.setMode('walk'); window.__game.interior.enter(window.__game.world.site('brahmaputra').blocks[0])",
+    "wait": 2500,
+    "check": "[window.__game.interior.active, window.__game.interior.kind]",
+    "expect": "hostel"
+  },
+  {
+    "name": "20 exit",
+    "do": "window.__game.interior.exit()",
+    "wait": 2000,
+    "check": "window.__game.interior.active",
+    "expect": "false"
+  },
+  {
+    "name": "21 lecture hall",
+    "do": "window.__game.interior.enter(window.__game.world.site('lhc').blocks[0])",
+    "wait": 2500,
+    "check": "[window.__game.interior.kind, window.__game.interior.count()]",
+    "expect": "lecture"
+  },
+  {
+    "name": "22 exit",
+    "do": "window.__game.interior.exit()",
+    "wait": 2000,
+    "check": "window.__game.interior.active",
+    "expect": "false"
+  },
+  {
+    "name": "23 library",
+    "do": "window.__game.interior.enter(window.__game.world.site('library').blocks[0])",
+    "wait": 2500,
+    "check": "window.__game.interior.kind",
+    "expect": "library"
+  },
+  {
+    "name": "24 exit",
+    "do": "window.__game.interior.exit()",
+    "wait": 2000,
+    "check": "window.__game.interior.active",
+    "expect": "false"
+  },
+  {
+    "name": "23b Computer Centre door",
+    "do": "const g=window.__game,cc=g.computerCentre; g.player.spawn(cc.x+Math.sin(cc.yaw)*1.5, cc.z+Math.cos(cc.yaw)*1.5); g.player.heading=cc.yaw+Math.PI",
+    "wait": 800,
+    "check": "(()=>{const c=window.__game.interact.current; return c && (typeof c.label==='function'?c.label():c.label)})()",
+    "expect": "Computer Centre"
+  },
+  {
+    "name": "23c enter it",
+    "do": "window.__game.interact.current.run()",
+    "wait": 2500,
+    "check": "[window.__game.interior.kind, window.__game.interior.plan.name]",
+    "expect": "computer.*Computer Centre"
+  },
+  {
+    "name": "23d exit to the door",
+    "do": "window.__game.interior.exit()",
+    "wait": 2000,
+    "check": "(()=>{const g=window.__game,cc=g.computerCentre; return [g.interior.active, Math.round(Math.hypot(g.player.pos.x-cc.x,g.player.pos.z-cc.z))]})()",
+    "expect": "false,[0-3]\\]"
+  },
+  {
+    "name": "25 auditorium",
+    "do": "window.__game.interior.enter(window.__game.world.site('auditorium').blocks[0])",
+    "wait": 2500,
+    "check": "window.__game.interior.kind",
+    "expect": "auditorium"
+  },
+  {
+    "name": "26 exit",
+    "do": "window.__game.interior.exit()",
+    "wait": 2000,
+    "check": "window.__game.interior.active",
+    "expect": "false"
+  },
+  {
+    "name": "27 hospital",
+    "do": "window.__game.interior.enter(window.__game.world.site('hospital').blocks[0])",
+    "wait": 2500,
+    "check": "window.__game.interior.kind",
+    "expect": "hospital"
+  },
+  {
+    "name": "28 exit",
+    "do": "window.__game.interior.exit()",
+    "wait": 2000,
+    "check": "window.__game.interior.active",
+    "expect": "false"
+  },
+  {
+    "name": "29 football",
+    "do": "const g=window.__game; g.clock.set(17.2); const s=g.sports.slots.find(s=>s.kind==='football'); if(!s.game) s.game=s.make(); g.activity.start(s.joinAct(s.game));",
+    "wait": 2500,
+    "check": "window.__game.activity.cur && window.__game.activity.cur.name",
+    "expect": "football"
+  },
+  {
+    "name": "30 stop",
+    "do": "window.__game.activity.stop(true)",
+    "wait": 500,
+    "check": "!!window.__game.activity.cur",
+    "expect": "false"
+  },
+  {
+    "name": "31 cricket batting",
+    "do": "const g=window.__game; const s=g.sports.slots.find(s=>s.kind==='cricket'); if(!s.game) s.game=s.make(); g.activity.start(s.joinAct(s.game));",
+    "wait": 3000,
+    "check": "window.__game.activity.cur && window.__game.activity.cur.name",
+    "expect": "cricket"
+  },
+  {
+    "name": "32 stop",
+    "do": "window.__game.activity.stop(true)",
+    "wait": 500,
+    "check": "!!window.__game.activity.cur",
+    "expect": "false"
+  },
+  {
+    "name": "33 volleyball swap",
+    "do": "const g=window.__game; const s=g.sports.slots.find(s=>s.kind==='volleyball'); if(!s.game) s.game=s.make(); g.activity.start(s.joinAct(s.game));",
+    "wait": 2500,
+    "check": "window.__game.activity.cur && window.__game.activity.cur.name",
+    "expect": "volleyball"
+  },
+  {
+    "name": "34 stop",
+    "do": "window.__game.activity.stop(true)",
+    "wait": 500,
+    "check": "!!window.__game.activity.cur",
+    "expect": "false"
+  },
+  {
+    "name": "35 basketball",
+    "do": "const g=window.__game; const s=g.sports.slots.find(s=>s.kind==='basketball'); if(!s.game) s.game=s.make(); g.activity.start(s.joinAct(s.game));",
+    "wait": 2500,
+    "check": "window.__game.activity.cur && window.__game.activity.cur.name",
+    "expect": "hoops"
+  },
+  {
+    "name": "36 stop",
+    "do": "window.__game.activity.stop(true)",
+    "wait": 500,
+    "check": "!!window.__game.activity.cur",
+    "expect": "false"
+  },
+  {
+    "name": "37 events calendar",
+    "do": "",
+    "wait": 100,
+    "check": "window.__game.events.week().map(w=>w.d.id).join(',')"
+  },
+  {
+    "name": "38 go to Techniche",
+    "do": "const g=window.__game; g.events.goTo(g.events.defs.find(d=>d.id==='techniche'))",
+    "wait": 4000,
+    "check": "[window.__game.clock.dayName, window.__game.clock.hour.toFixed(1), !!window.__game.events.current()]",
+    "expect": "true"
+  },
+  {
+    "name": "39 back to a weekday morning",
+    "do": "const g=window.__game; g.events.goTo(g.events.defs.find(d=>d.id==='aiconf'))",
+    "wait": 3000,
+    "check": "[window.__game.clock.dayName, !!window.__game.events.current()]"
+  },
+  {
+    "name": "40 row boat",
+    "do": "const g=window.__game; g.progress.coins=900; g.boats.start(g.boats.jetties[0],'row')",
+    "wait": 1200,
+    "check": "[window.__game.mode, window.__game.boats.kind]",
+    "expect": "boat.*row"
+  },
+  {
+    "name": "41 out of boat",
+    "do": "window.__game.setMode('walk')",
+    "wait": 600,
+    "check": "window.__game.mode",
+    "expect": "walk"
+  },
+  {
+    "name": "42 e-rickshaw ride",
+    "do": "const g=window.__game; const v=g.transport.list.find(v=>v.kind==='erick'); v.v=0; window.__ok = g.transport.startRide(v)",
+    "wait": 2000,
+    "check": "[window.__ok, window.__game.mode]",
+    "expect": "true.*ride"
+  },
+  {
+    "name": "43 get off",
+    "do": "window.__game.transport.endRide()",
+    "wait": 500,
+    "check": "window.__game.mode",
+    "expect": "walk"
+  },
+  {
+    "name": "44 taxi home",
+    "do": "window.__game.goHome()",
+    "wait": 2500,
+    "check": "[window.__game.mode, window.__game.clock.hour.toFixed(1)]",
+    "expect": "walk.*8.5"
+  },
+  {
+    "name": "45 order food",
+    "do": "const g=window.__game; g.clock.set(20); window.__ord = g.transport.order('Tiffin service','Masala dosa',80,40)",
+    "wait": 800,
+    "check": "[window.__ord, !!window.__game.transport.myOrder]",
+    "expect": "true.*true"
+  },
+  {
+    "name": "46 late for class race",
+    "do": "const g=window.__game; g.clock.set(10.3); g.startChallenge()",
+    "wait": 1500,
+    "check": "[window.__game.challengeRun.active, window.__game.challengeRun.info.lm.id, window.__game.music.theme]",
+    "expect": "true"
+  },
+  {
+    "name": "47 stop race",
+    "do": "window.__game.challengeRun.stop(); window.__game.setMode('walk')",
+    "wait": 400,
+    "check": "window.__game.challengeRun.active",
+    "expect": "false"
+  },
+  {
+    "name": "48 Khokha closed at night (walk)",
+    "do": "window.__game.clock.set(23)",
+    "wait": 400,
+    "check": "(() => { const g=window.__game, gt=g.world.gates.find(q=>/Khokha/.test(q.name)); return [g.world.gateOpen(gt, 23, 'walk'), g.world.gateOpen(gt, 10, 'walk'), g.world.gateOpen(gt, 10, 'car'), g.world.gateOpen(g.world.gates.find(q=>q.main), 3, 'car')]; })()",
+    "expect": "false,true,false,true"
+  },
+  {
+    "name": "49 weather storm",
+    "do": "window.__game.clock.set(15); window.__game.weather.setMode('storm')",
+    "wait": 2500,
+    "check": "[window.__game.weather.state.name, window.__game.weather.state.rain.toFixed(2)]"
+  },
+  {
+    "name": "50 weather fog",
+    "do": "window.__game.weather.setMode('fog')",
+    "wait": 1500,
+    "check": "window.__game.weather.state.name"
+  },
+  {
+    "name": "51 clear",
+    "do": "window.__game.weather.setMode('auto')",
+    "wait": 800,
+    "check": "window.__game.weather.mode",
+    "expect": "auto"
+  },
+  {
+    "name": "52 map / journal / planner / pause",
+    "do": "const u=window.__game.ui; u.openMap(); u.closeAll(); u.openJournal(); u.closeAll(); u.openPlanner(); u.closeAll(); u.openPause(); u.closeAll();",
+    "wait": 500,
+    "check": "window.__game.ui.anyOpen()",
+    "expect": "false"
+  },
+  {
+    "name": "53 character creator",
+    "do": "window.__game.setMode('custom')",
+    "wait": 800,
+    "check": "window.__game.mode",
+    "expect": "custom"
+  },
+  {
+    "name": "54 back",
+    "do": "window.__game.ui.closeAll(); window.__game.endCustom(); window.__game.setMode('walk')",
+    "wait": 500,
+    "check": "window.__game.mode",
+    "expect": "walk"
+  },
+  {
+    "name": "55 swim",
+    "do": "const g=window.__game, w=g.world.water.find(q=>q.kind==='pool'); const r=w.rings[0]; let cx=0,cz=0; for(let i=0;i<r.length;i+=2){cx+=r[i];cz+=r[i+1];} cx/=r.length/2; cz/=r.length/2; g.player.pos.set(cx, w.level+0.2, cz); g.player.vel.set(0,0,0);",
+    "wait": 1200,
+    "check": "window.__game.player.swimming",
+    "expect": "true"
+  },
+  {
+    "name": "56 pizza job",
+    "do": "const g=window.__game; g.player.spawn(g.jobs.pizzeria.x+2, g.jobs.pizzeria.z+2); g.jobs.startPizza()",
+    "wait": 1500,
+    "check": "[window.__game.mode, !!window.__game.jobs.job, window.__game.jobs.job?.kind]",
+    "expect": "true.*pizza"
+  },
+  {
+    "name": "57 end job",
+    "do": "const g=window.__game; if (g.jobs.job) g.jobs.end('qa'); g.setMode('walk')",
+    "wait": 600,
+    "check": "window.__game.mode",
+    "expect": "walk"
+  },
+  {
+    "name": "58 save",
+    "do": "window.__game.progress.save()",
+    "wait": 200,
+    "check": "(localStorage.getItem('iitg3d.save.v1') || '').length > 100",
+    "expect": "true"
+  },
+  {
+    "name": "59 murals painted",
+    "check": "[window.__game.signage.counts.murals, window.__game.signage.counts.muralPages, (window.__game.world.murals||[]).filter(m=>m.art===\"graffiti\").length]",
+    "expect": "^\\[([6-9]\\d|1\\d\\d),\\d+,(3\\d|[4-9]\\d)\\]$"
+  },
+  {
+    "name": "60 bus stands + shuttles",
+    "check": "[window.__game.busStops.stops.length, window.__game.traffic.agents?.filter?.(a=>a.kind===\"shuttle\").length]",
+    "expect": "^\\[[5-9]"
+  },
+  {
+    "name": "61 roundabouts",
+    "check": "window.__game.islands.map(i=>i.name)",
+    "expect": "Rhino Circle"
+  },
+  {
+    "name": "62 View Point guards + 16 places",
+    "check": "[window.__game.viewpoint.guards.length, window.__game.venues.view.length]",
+    "expect": "^\\[2,1[0-9]\\]"
+  },
+  {
+    "name": "63 shop names: only the three outlets asked for are real brand names (Cafe Coffee Day, Domino's Pizza, KFC), all as plain signs",
+    "check": "window.__game.stallsObj.stalls.concat(window.__game.stallsObj.shops||[]).map(s=>s.name).join(\"|\")",
+    "expect": "^(?!.*(Subway|Baskin|Maggi)).*$"
+  },
+  {
+    "name": "64 HUD: money only",
+    "check": "[!!document.getElementById('w-coins'), !document.getElementById('w-energy'), !document.getElementById('w-cpi'), !document.getElementById('envmeter'), document.getElementById('w-card').textContent]",
+    "expect": "^\\[true,true,true,true,\"credit limit"
+  },
+  {
+    "name": "65 N cycles the time of day",
+    "do": "window.__game.clock.set(11.25); window.__game.ui.closeAll()",
+    "keys": [
+      "KeyN"
+    ],
+    "wait": 500,
+    "check": "+window.__game.clock.hour.toFixed(2)",
+    "expect": "^15$"
+  },
+  {
+    "name": "66 Shift+N opens weather",
+    "keys": [
+      "ShiftLeft+KeyN"
+    ],
+    "wait": 500,
+    "check": "!document.getElementById('planner').hidden",
+    "expect": "true"
+  },
+  {
+    "name": "67 close planner",
+    "do": "window.__game.ui.closeAll()",
+    "check": "document.getElementById('planner').hidden",
+    "expect": "true"
+  },
+  {
+    "name": "68 OneStop machines, gates, booms, doors",
+    "check": "(()=>{const o=window.__game.onestop;return [o.kiosks.length>30,o.built,o.gates.length,o.booms.length,o.doors.length>=15]})()",
+    "expect": "true,true,1,0,true"
+  },
+  {
+    "name": "69 entrances: Computer Centre and Cafe Coffee Day",
+    "check": "['computercentre','campuscafe'].map(id=>!!window.__game.world.landmark(id))",
+    "expect": "true,true"
+  },
+  {
+    "name": "70 pool complex",
+    "check": "[window.__game.poolObj.rooms.length, window.__game.poolObj.blocks.length, window.__game.poolObj.showers.length, (window.__game.hood.meet||{}).racers?.length]",
+    "expect": "^\\[5,\\d,4,\\d"
+  },
+  {
+    "name": "71 camera hides the body",
+    "do": "window.__game.setMode('camera')",
+    "wait": 700,
+    "check": "[!window.__game.player.avatar.root.visible, window.__game.mode]",
+    "expect": "true,\"camera\""
+  },
+  {
+    "name": "72 camera back",
+    "do": "window.__game.setMode('walk')",
+    "wait": 400,
+    "check": "window.__game.player.avatar.root.visible",
+    "expect": "true"
+  },
+  {
+    "name": "73 boy at a girls' hostel, 3 AM: refused",
+    "do": "window.__game.clock.set(3); window.__game.player.setLook({...( window.__game.player.avatar.look),body:'male'}); window.__game.interiors.enter(window.__game.world.site('subansiri').blocks[0])",
+    "wait": 1200,
+    "check": "window.__game.interior.active",
+    "expect": "false"
+  },
+  {
+    "name": "74 5 PM: allowed, the visitors' register",
+    "do": "window.__game.clock.set(17); window.__game.interiors.enter(window.__game.world.site('subansiri').blocks[0])",
+    "wait": 2000,
+    "check": "[window.__game.interior.active, window.__game.activity.cur&&window.__game.activity.cur.name]",
+    "expect": "true,\"register\""
+  },
+  {
+    "name": "75 leave",
+    "do": "window.__game.activity.stop(true); window.__game.interior.exit()",
+    "wait": 1500,
+    "check": "window.__game.interior.active",
+    "expect": "false"
+  },
+  {
+    "name": "76a walk up to a (boys') hostel machine",
+    "do": "Object.assign(window.__game.progress.profile,{setup:true,name:'Test Student',roll:'23015004512',room:'B-214',hostel:'manas'}); (()=>{const g=window.__game,k=g.onestop.kiosks.find(q=>q.id==='hostel-lohit'); g.player.spawn(k.x+Math.sin(k.yaw)*1.2,k.z+Math.cos(k.yaw)*1.2,k.yaw+Math.PI)})()",
+    "wait": 900,
+    "check": "document.getElementById('prompt') && document.getElementById('prompt').innerText.replace(/\\s+/g,' ')",
+    "expect": "Scan in with OneStop"
+  },
+  {
+    "name": "76b scan it: in, with the time",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 3600,
+    "check": "[document.querySelector('#phone .os-result h3')&&document.querySelector('#phone .os-result h3').textContent, window.__game.onestop.isIn('lohit')]",
+    "expect": "In ·.*true"
+  },
+  {
+    "name": "77 close the phone",
+    "keys": [
+      "Escape"
+    ],
+    "wait": 500,
+    "check": "document.getElementById('phone').hidden",
+    "expect": "true"
+  },
+  {
+    "name": "78 Computer Centre PC: IITG OS boots, and is styled (OneStop opened first)",
+    "do": "(async()=>{const g=window.__game,cc=g.computerCentre; g.player.spawn(cc.x+Math.sin(cc.yaw)*1.4,cc.z+Math.cos(cc.yaw)*1.4,cc.yaw+Math.PI); await new Promise(r=>setTimeout(r,400)); await g.interiors.enter(cc.b,{template:'computer',name:'Computer Centre',outside:{x:cc.x,z:cc.z,yaw:cc.yaw}}); await new Promise(r=>setTimeout(r,800)); g.interiors.plan.acts.find(q=>/Use this computer/.test(q.label)).run();})()",
+    "wait": 4200,
+    "check": "[!!document.querySelector('.os'), document.querySelector('.os .lock').classList.contains('on'), getComputedStyle(document.querySelector('.os')).position, !!document.getElementById('onestop-css')&&!!document.getElementById('os-css')]",
+    "expect": "true,true,\"absolute\",true"
+  },
+  {
+    "name": "79 sign in and open every app",
+    "do": "(()=>{document.querySelector('.os .lock button').click(); const o=window.__game.os; for (const id of ['browser','youtube','explorer','notepad','paint','calc','photos','terminal','settings','clock','taskman','snake']) o.openApp(id);})()",
+    "wait": 1500,
+    "check": "window.__game.os.wins.map(w=>w.id).join(',')",
+    "expect": "browser,youtube,explorer,notepad,paint,calc,photos,terminal,settings,clock,taskman,snake"
+  },
+  {
+    "name": "80 without the local server the browser says so",
+    "do": "(()=>{const o=window.__game.os; o.openApp('browser',{go:'www.iitg.ac.in',newWindow:true})})()",
+    "wait": 900,
+    "check": "!!document.querySelector('.os .br .err')||!!document.querySelector('.os .br iframe')",
+    "expect": "true"
+  },
+  {
+    "name": "81 stand up",
+    "do": "window.__game.activity.stop(true)",
+    "wait": 900,
+    "check": "[!document.querySelector('#pc-layer'), window.__game.input.enabled]",
+    "expect": "true,true"
+  },
+  {
+    "name": "82 KV Gate desk: scan out (City) makes the entry",
+    "do": "(async()=>{const g0=window.__game;if(g0.interior.active)await g0.interiors.exit(0,{noScan:true});const g=window.__game,gt=g.world.gates.find(q=>q.name==='KV Gate'),ox=Math.cos(gt.angle),oz=-Math.sin(gt.angle);g.clock.set(11);window.__kv={ox,oz,gt};await g.fastTravel(gt.wx-ox*3,gt.wz-oz*3,true);g.player.spawn(gt.wx-ox*3,gt.wz-oz*3,0);g.onestop.store.dest='City';g.onestop.scanAt(g.onestop.kiosks.find(q=>q.id==='gate-KV Gate'));})()",
+    "wait": 2500,
+    "check": "(()=>{const g=window.__game,e=g.onestop.entries[0];return [e.dest,e.a&&e.a.gate,!e.b]})()",
+    "expect": "\"City\",\"KV Gate\",true"
+  },
+  {
+    "name": "83 walk out through the open gate (nothing to open, you just walk)",
+    "do": "(async()=>{const g=window.__game,{ox,oz}=window.__kv;g.onestop.close();for(let i=0;i<130;i++){const px=g.player.pos.x,pz=g.player.pos.z;g.player.pos.x+=ox*0.07;g.player.pos.z+=oz*0.07;g.world.wallStep({x:px,z:pz},g.player.pos,'walk',g.clock.hour);await new Promise(r=>setTimeout(r,16));}window.__out=!g.world.insideCampus(g.player.pos.x,g.player.pos.z);})()",
+    "wait": 3200,
+    "check": "window.__out",
+    "expect": "true"
+  },
+  {
+    "name": "84 scan in at the desk: the entry closes",
+    "do": "(()=>{const g=window.__game;g.clock.advance(0.5);g.onestop.scanAt(g.onestop.kiosks.find(q=>q.id==='gate-KV Gate'));})()",
+    "wait": 4800,
+    "check": "(()=>{const e=window.__game.onestop.entries[0];return [window.__out,e.a&&e.a.gate,e.b&&e.b.gate,e.b&&e.b.dir]})()",
+    "expect": "true,\"KV Gate\",\"KV Gate\",\"in\""
+  },
+  {
+    "name": "85 close the phone",
+    "do": "window.__game.onestop.close()",
+    "wait": 400,
+    "check": "document.getElementById('phone').hidden",
+    "expect": "true"
+  },
+  {
+    "name": "86 swimmers swim face down (crawl)",
+    "do": "window.__game.clock.set(7.5)",
+    "wait": 1500,
+    "check": "window.__game.hood.people.filter(p=>p.kind==='swim'&&p.visible!==false).map(p=>p.anim).slice(0,3).join(',')",
+    "expect": "41"
+  },
+  {
+    "name": "87 lakes: lotus, reeds, benches",
+    "check": "(()=>{const c=window.__game.lakeside.counts;return [c.pads>500,c.flowers>100,c.reeds>100,c.benches>4]})()",
+    "expect": "true,true,true,true"
+  },
+  {
+    "name": "88 couples by the lakes after dark",
+    "do": "window.__game.clock.set(21)",
+    "wait": 1500,
+    "check": "[window.__game.couples.dark, window.__game.couples.lakes.length, window.__game.couples.lakes[0].couples.filter(c=>c.act).length>5]",
+    "expect": "true,2,true"
+  },
+  {
+    "name": "89 no staff quarters scattered along the roads",
+    "check": "window.__game.world.buildings.filter(b=>b.kind==='residential'&&!b.name).length<320",
+    "expect": "true"
+  },
+  {
+    "name": "90 reset: outdoors, 11 am, time paused",
+    "do": "(async () => { const g = window.__game; g.ui.closeAll(); if (g.interior.active) await g.interiors.exit(0, { noScan: true }); g.activity.stop(true); g.setMode('walk'); g.clock.speedId = 'pause'; g.weather.setMode('clear'); g.weather.pick(true); g.progress.coins = 5000; g.progress.bank = 20000; })()",
+    "wait": 400,
+    "check": "window.__game.mode",
+    "expect": "walk"
+  },
+  {
+    "name": "91 F1 opens the Game Guide",
+    "keys": [
+      "F1"
+    ],
+    "wait": 800,
+    "check": "(() => { const el = document.getElementById('guide'); return [!el.hidden, document.querySelectorAll('#guide-list .g-item').length, document.getElementById('guide-main').textContent.includes('things that work')]; })()",
+    "expect": "^\\[true,\\d{2,3},true\\]$"
+  },
+  {
+    "name": "92 Guide: the swimming pool lists its changing rooms",
+    "do": "window.__game.gameGuide.select('pool')",
+    "wait": 300,
+    "check": "(() => { const t = document.getElementById('guide-main').textContent.toLowerCase(); return [t.includes('changing room'), document.querySelectorAll('#guide-main .feat').length > 4, !!document.querySelector('#guide-main .feat .si.ok')]; })()",
+    "expect": "^\\[true,true,true\\]$"
+  },
+  {
+    "name": "93 Guide: search narrows the list",
+    "do": "(() => { const q = document.getElementById('guide-q'); q.value = 'swim'; q.dispatchEvent(new Event('input')); })()",
+    "wait": 300,
+    "check": "(() => { const n = document.querySelectorAll('#guide-list .g-item').length; return [n > 0, n < 25]; })()",
+    "expect": "^\\[true,true\\]$"
+  },
+  {
+    "name": "94 Guide: the limits page lists what works only in part or not at all",
+    "do": "(() => { const q = document.getElementById('guide-q'); q.value = ''; q.dispatchEvent(new Event('input')); window.__game.gameGuide.select('limits'); })()",
+    "wait": 300,
+    "check": "[document.querySelectorAll('#guide-main .feat.part').length > 5, document.querySelectorAll('#guide-main .feat.no').length > 5]",
+    "expect": "^\\[true,true\\]$"
+  },
+  {
+    "name": "95 Esc closes the Guide",
+    "keys": [
+      "Escape"
+    ],
+    "wait": 400,
+    "check": "document.getElementById('guide').hidden",
+    "expect": "true"
+  },
+  {
+    "name": "96 I: what the library is (Info panel)",
+    "do": "(async () => { const g = window.__game, s = g.world.site('library'); await g.fastTravel(s.ex + s.nx * 4, s.ez + s.nz * 4, true); const P = g.player; P.heading = Math.atan2(s.ex - P.pos.x, s.ez - P.pos.z); P.camYaw = P.heading; g.gameGuide.infoOpen = false; })()",
+    "keys": [
+      "KeyI"
+    ],
+    "wait": 1200,
+    "check": "(() => { const el = document.getElementById('info'); return [!el.hidden, /library/i.test(el.textContent), el.querySelectorAll('.i-list li').length > 2]; })()",
+    "expect": "^\\[true,true,true\\]$"
+  },
+  {
+    "name": "97 I again closes it",
+    "keys": [
+      "KeyI"
+    ],
+    "wait": 500,
+    "check": "document.getElementById('info').hidden",
+    "expect": "true"
+  },
+  {
+    "name": "98 I inside a hostel",
+    "do": "(async () => { const g = window.__game; g.clock.set(11); if (g.interior.active) await g.interiors.exit(0, { noScan: true }); const s = g.world.site('manas'); await g.fastTravel(s.ex + s.nx * 3, s.ez + s.nz * 3, true); await g.interiors.enter(s.blocks[0], { noScan: true }); })()",
+    "wait": 1200,
+    "keys": [
+      "KeyI"
+    ],
+    "check": "(() => { const el = document.getElementById('info'); return [!el.hidden, /hostel/i.test(el.textContent)]; })()",
+    "expect": "^\\[true,true\\]$"
+  },
+  {
+    "name": "99 I closes the panel again",
+    "keys": [
+      "KeyI"
+    ],
+    "wait": 500,
+    "check": "document.getElementById('info').hidden",
+    "expect": "true"
+  },
+  {
+    "name": "100 leave the hostel",
+    "do": "window.__game.interiors.exit(0, { noScan: true })",
+    "wait": 900,
+    "check": "window.__game.interior.active",
+    "expect": "false"
+  },
+  {
+    "name": "101 Esc opens the pause menu on the Game tab",
+    "do": "window.__game.input.exitLock()",
+    "keys": [
+      "Escape"
+    ],
+    "wait": 600,
+    "check": "[!document.getElementById('pause').hidden, document.getElementById('pause-title').textContent, document.querySelectorAll('#pause-nav [data-tab]').length]",
+    "expect": "^\\[true,\"[A-Za-z &]+\",\\d+\\]$"
+  },
+  {
+    "name": "102 Pause menu: every tab renders",
+    "do": "(() => { const out = []; for (const t of ['game', 'sound', 'display', 'controls', 'data', 'about']) { window.__game.ui.openPause(t); const p = document.getElementById('pause-pane'); out.push(p.children.length > 0 && p.textContent.length > 80); } window.__tabs = out; })()",
+    "wait": 300,
+    "check": "window.__tabs",
+    "expect": "^\\[true,true,true,true,true,true\\]$"
+  },
+  {
+    "name": "103 Pause menu: Progress & backup explains export and import",
+    "do": "window.__game.ui.openPause('data')",
+    "wait": 300,
+    "check": "(() => { const t = document.getElementById('pause-pane').textContent; return [/backup/i.test(t), /export/i.test(t), /import/i.test(t)]; })()",
+    "expect": "^\\[true,true,true\\]$"
+  },
+  {
+    "name": "104 Pause menu: Controls lists Info, OneStop and Mute",
+    "do": "window.__game.ui.openPause('controls')",
+    "wait": 300,
+    "check": "(() => { const t = document.getElementById('pause-pane').textContent; return [/Info/i.test(t), /OneStop/i.test(t), /Mute/i.test(t)]; })()",
+    "expect": "^\\[true,true,true\\]$"
+  },
+  {
+    "name": "105 Pause menu: the About tab names the author and version",
+    "do": "window.__game.ui.openPause('about')",
+    "wait": 300,
+    "check": "(() => { const t = document.getElementById('pause-pane').textContent; return [/Gaurav Vyas/.test(t), /4\\.0/.test(t)]; })()",
+    "expect": "^\\[true,true\\]$"
+  },
+  {
+    "name": "106 Esc resumes",
+    "keys": [
+      "Escape"
+    ],
+    "wait": 500,
+    "check": "document.getElementById('pause').hidden",
+    "expect": "true"
+  },
+  {
+    "name": "107 OneStop: Campus Live",
+    "do": "(() => { window.__game.clock.set(13.2); window.__game.onestop.open('live'); })()",
+    "wait": 500,
+    "check": "(() => { const t = document.getElementById('phone').textContent; return [/Campus Live/i.test(t), t.length > 200]; })()",
+    "expect": "^\\[true,true\\]$"
+  },
+  {
+    "name": "108 OneStop: a guest meal coupon can be bought",
+    "do": "(() => { const g = window.__game; window.__c0 = g.progress.coupons.length; g.progress.bank = 20000; g.onestop.open('buycoupon'); })()",
+    "wait": 400,
+    "check": "!!document.querySelector('#phone [data-a=\"pay-coupon\"]')",
+    "expect": "true"
+  },
+  {
+    "name": "109 OneStop: paying keeps the coupon",
+    "do": "document.querySelector('#phone [data-a=\"pay-coupon\"]').click()",
+    "wait": 500,
+    "check": "window.__game.progress.coupons.length > window.__c0",
+    "expect": "true"
+  },
+  {
+    "name": "110 OneStop: closing the phone",
+    "do": "window.__game.onestop.close()",
+    "wait": 400,
+    "check": "window.__game.onestop.isOpen()",
+    "expect": "false"
+  },
+  {
+    "name": "111 O opens the OneStop phone (away from any machine)",
+    "do": "(async () => { const g = window.__game; g.ui.closeAll(); await g.fastTravel(-150, -330, true); g.setMode('walk'); })()",
+    "keys": [
+      "KeyO"
+    ],
+    "wait": 700,
+    "check": "window.__game.onestop.isOpen()",
+    "expect": "true"
+  },
+  {
+    "name": "112 O phone: close it again",
+    "do": "window.__game.onestop.close()",
+    "wait": 400,
+    "check": "window.__game.onestop.isOpen()",
+    "expect": "false"
+  },
+  {
+    "name": "113 hostel mess at lunch: a crowd of students",
+    "do": "(async () => { const g = window.__game; g.clock.set(13); if (g.interior.active) await g.interiors.exit(0, { noScan: true }); const s = g.world.site('manas'); await g.fastTravel(s.ex + s.nx * 3, s.ez + s.nz * 3, true); await g.interiors.enter(s.blocks[0], { noScan: true }); })()",
+    "wait": 3500,
+    "check": "(() => { const I = window.__game.interiors, F = I.flow; return [!!F, F ? F.people(I.O).length > 10 : false]; })()",
+    "expect": "^\\[true,true\\]$"
+  },
+  {
+    "name": "114 mess: the counter asks for your mess card",
+    "do": "(() => { const g = window.__game, O = g.interior.O, P = g.player; P.pos.set(O.x + -8.6, O.y + 0, O.z + 11.4); P.heading = Math.PI; P.camYaw = Math.PI; P.vel.set(0, 0, 0); })()",
+    "wait": 600,
+    "check": "(() => { const c = window.__game.interact.current; return c ? (typeof c.label === 'function' ? c.label() : c.label) : null; })()",
+    "expect": "mess card"
+  },
+  {
+    "name": "115 mess: E opens the payment panel",
+    "do": "window.__cu0 = window.__game.progress.coupons.filter((c) => !c.used).length",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 900,
+    "check": "window.__game.activity.cur ? window.__game.activity.cur.name : null",
+    "expect": "^\"messPay\"$"
+  },
+  {
+    "name": "116 mess: paying (first option) gives you a coupon for this meal",
+    "keys": [
+      "Digit1"
+    ],
+    "wait": 900,
+    "check": "window.__game.progress.coupons.filter((c) => !c.used).length > window.__cu0",
+    "expect": "true"
+  },
+  {
+    "name": "117 mess: take a plate from the stack",
+    "do": "(() => { const g = window.__game, O = g.interior.O, P = g.player; P.pos.set(O.x + -12.6, O.y + 0, O.z + 9.3); P.heading = Math.PI; P.camYaw = Math.PI; P.vel.set(0, 0, 0); })()",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 900,
+    "check": "(() => { const m = window.__game.mess; return [!!m.carrying, m.carrying && m.carrying.phase]; })()",
+    "expect": "^\\[true,\"empty\"\\]$"
+  },
+  {
+    "name": "118 mess: the serving counter takes your coupon",
+    "do": "(() => { const g = window.__game, O = g.interior.O, P = g.player; P.pos.set(O.x + -13, O.y + 0, O.z + -10.6); P.heading = Math.PI; P.camYaw = Math.PI; P.vel.set(0, 0, 0); })()",
+    "wait": 600,
+    "check": "(() => { const c = window.__game.interact.current; return c ? (typeof c.label === 'function' ? c.label() : c.label) : null; })()",
+    "expect": "coupon"
+  },
+  {
+    "name": "119 mess: the plate gets served",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 7000,
+    "check": "(() => { const m = window.__game.mess; return [m.carrying && m.carrying.phase, !!(m.carrying && m.carrying.thali)]; })()",
+    "expect": "^\\[\"served\",true\\]$"
+  },
+  {
+    "name": "120 mess: sit down at a free table",
+    "do": "(() => { const g = window.__game, I = g.interior, s = I.plan.seats.filter((q) => q.mess && !q.npc && !q.taken && !q.flowOwner)[3]; const O = I.O, P = g.player; P.pos.set(O.x + s.x, O.y, O.z + s.z); P.heading = s.yaw; P.camYaw = s.yaw; P.vel.set(0, 0, 0); })()",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 1500,
+    "check": "window.__game.activity.cur ? window.__game.activity.cur.name : null",
+    "expect": "^\"messEat\"$"
+  },
+  {
+    "name": "121 mess: eat it all (the plate empties)",
+    "do": "(() => { const a = window.__game.activity.cur; a.bite = a.total; })()",
+    "wait": 1500,
+    "check": "[window.__game.mess.carrying && window.__game.mess.carrying.phase, window.__game.activity.cur ? window.__game.activity.cur.name : null]",
+    "expect": "^\\[\"eaten\",null\\]$"
+  },
+  {
+    "name": "122 mess: return the plate at the rack",
+    "do": "(() => { const g = window.__game, O = g.interior.O, P = g.player; P.pos.set(O.x + -15.75, O.y + 0, O.z + -0.6); P.heading = -Math.PI / 2; P.camYaw = -Math.PI / 2; P.vel.set(0, 0, 0); })()",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 800,
+    "check": "window.__game.mess.carrying ? 'holding' : 'returned'",
+    "expect": "^\"returned\"$"
+  },
+  {
+    "name": "123 mess: leave the hostel",
+    "do": "window.__game.interiors.exit(0, { noScan: true })",
+    "wait": 900,
+    "check": "window.__game.interior.active",
+    "expect": "false"
+  },
+  {
+    "name": "124 presenter PC, Auditorium: the podium offers it",
+    "do": "(async () => { const g = window.__game; g.clock.set(20); if (g.interior.active) await g.interiors.exit(0, { noScan: true }); const s = g.world.site('auditorium'); await g.fastTravel(s.ex + s.nx * 3, s.ez + s.nz * 3, true); await g.interiors.enter(s.blocks[0], { noScan: true }); })().then(() => { const g = window.__game, O = g.interior.O, P = g.player; P.pos.set(O.x + -6.5, O.y + 1.2, O.z + -11.95); P.heading = 0; P.camYaw = 0; P.vel.set(0, 0, 0); })",
+    "wait": 1800,
+    "check": "(() => { const c = window.__game.interact.current; return c ? (typeof c.label === 'function' ? c.label() : c.label) : null; })()",
+    "expect": "Presenter PC"
+  },
+  {
+    "name": "125 presenter PC, Auditorium: E sits you at it, locked",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 3000,
+    "check": "[window.__game.activity.cur ? window.__game.activity.cur.name : null, window.__game.os ? window.__game.os.locked : null]",
+    "expect": "^\\[\"pc\",true\\]$"
+  },
+  {
+    "name": "126 presenter PC, Auditorium: a wrong password is refused",
+    "type": "wrong\n",
+    "wait": 700,
+    "check": "window.__game.os.locked",
+    "expect": "true"
+  },
+  {
+    "name": "127 presenter PC, Auditorium: iitg / iitg signs in",
+    "type": "iitg\n",
+    "wait": 1500,
+    "check": "[window.__game.os.locked, window.__game.os.userName]",
+    "expect": "^\\[false,\"?iitg"
+  },
+  {
+    "name": "128 presenter PC, Auditorium: Esc stands you up",
+    "keys": [
+      "Escape"
+    ],
+    "wait": 900,
+    "check": "[window.__game.activity.cur ? window.__game.activity.cur.name : null, !!document.getElementById('pc-layer')]",
+    "expect": "^\\[null,false\\]$"
+  },
+  {
+    "name": "129 presenter PC, Conference Centre: the podium offers it",
+    "do": "(async () => { const g = window.__game; g.clock.set(20); if (g.interior.active) await g.interiors.exit(0, { noScan: true }); const s = g.world.site('conference'); await g.fastTravel(s.ex + s.nx * 3, s.ez + s.nz * 3, true); await g.interiors.enter(s.blocks[0], { noScan: true }); })().then(() => { const g = window.__game, O = g.interior.O, P = g.player; P.pos.set(O.x + -5.4, O.y + 0.4, O.z + -9.35); P.heading = 0; P.camYaw = 0; P.vel.set(0, 0, 0); })",
+    "wait": 1800,
+    "check": "(() => { const c = window.__game.interact.current; return c ? (typeof c.label === 'function' ? c.label() : c.label) : null; })()",
+    "expect": "Presenter PC"
+  },
+  {
+    "name": "130 presenter PC, Conference Centre: E sits you at it, locked",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 3000,
+    "check": "[window.__game.activity.cur ? window.__game.activity.cur.name : null, window.__game.os ? window.__game.os.locked : null]",
+    "expect": "^\\[\"pc\",true\\]$"
+  },
+  {
+    "name": "131 presenter PC, Conference Centre: a wrong password is refused",
+    "type": "wrong\n",
+    "wait": 700,
+    "check": "window.__game.os.locked",
+    "expect": "true"
+  },
+  {
+    "name": "132 presenter PC, Conference Centre: iitg / iitg signs in",
+    "type": "iitg\n",
+    "wait": 1500,
+    "check": "[window.__game.os.locked, window.__game.os.userName]",
+    "expect": "^\\[false,\"?iitg"
+  },
+  {
+    "name": "133 presenter PC, Conference Centre: Esc stands you up",
+    "keys": [
+      "Escape"
+    ],
+    "wait": 900,
+    "check": "[window.__game.activity.cur ? window.__game.activity.cur.name : null, !!document.getElementById('pc-layer')]",
+    "expect": "^\\[null,false\\]$"
+  },
+  {
+    "name": "134 leave the hall",
+    "do": "window.__game.interiors.exit(0, { noScan: true })",
+    "wait": 900,
+    "check": "window.__game.interior.active",
+    "expect": "false"
+  },
+  {
+    "name": "135 library: the issue desk lends books",
+    "do": "(async () => { const g = window.__game; g.clock.set(11); if (g.interior.active) await g.interiors.exit(0, { noScan: true }); const s = g.world.site('library'); await g.fastTravel(s.ex + s.nx * 3, s.ez + s.nz * 3, true); await g.interiors.enter(s.blocks[0], { noScan: true }); })().then(() => { (() => { const g = window.__game, O = g.interior.O, P = g.player; P.pos.set(O.x + -12, O.y + 0, O.z + 12.3); P.heading = 0; P.camYaw = 0; P.vel.set(0, 0, 0); })(); })",
+    "wait": 1500,
+    "check": "(() => { const c = window.__game.interact.current; return c ? (typeof c.label === 'function' ? c.label() : c.label) : null; })()",
+    "expect": "Issue / return books"
+  },
+  {
+    "name": "136 library: E opens the issue desk",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 600,
+    "check": "window.__game.activity.cur ? window.__game.activity.cur.name : null",
+    "expect": "^\"libraryDesk\"$"
+  },
+  {
+    "name": "137 library: books are borrowed",
+    "do": "(() => { const a = window.__game.activity.cur; a.borrow('Let Us C'); a.borrow('Malgudi Days'); })()",
+    "wait": 300,
+    "check": "window.__game.progress.loans.length",
+    "expect": "^[2-9]"
+  },
+  {
+    "name": "138 library: a late return is fined",
+    "do": "(() => { const g = window.__game; g.clock.advance && g.clock.advance(24 * 16); window.__coins0 = g.progress.coins; g.activity.cur.giveBack(0); })()",
+    "wait": 400,
+    "check": "window.__coins0 - window.__game.progress.coins",
+    "expect": "^[1-9]"
+  },
+  {
+    "name": "139 library: Esc leaves the desk",
+    "keys": [
+      "Escape"
+    ],
+    "wait": 400,
+    "check": "window.__game.activity.cur ? window.__game.activity.cur.name : null",
+    "expect": "^null$"
+  },
+  {
+    "name": "140 gym: the locker room changes your clothes",
+    "do": "(async () => { const g = window.__game; g.clock.set(11); if (g.interior.active) await g.interiors.exit(0, { noScan: true }); const s = g.world.site('gym'); await g.fastTravel(s.ex + s.nx * 3, s.ez + s.nz * 3, true); await g.interiors.enter(s.blocks[0], { noScan: true }); })().then(() => { (() => { const g = window.__game, O = g.interior.O, P = g.player; P.pos.set(O.x + 11.4, O.y + 0, O.z + 8.1); P.heading = 0; P.camYaw = 0; P.vel.set(0, 0, 0); })(); window.__top0 = window.__game.player.avatar.look.top; })",
+    "wait": 1500,
+    "check": "(() => { const c = window.__game.interact.current; return c ? (typeof c.label === 'function' ? c.label() : c.label) : null; })()",
+    "expect": "Change into gym wear"
+  },
+  {
+    "name": "141 gym: E puts on gym wear",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 600,
+    "check": "[window.__game.player.avatar.look.top !== window.__top0, !!window.__game.gymSaved]",
+    "expect": "^\\[true,true\\]$"
+  },
+  {
+    "name": "142 gym: E again puts your own clothes back",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 600,
+    "check": "[window.__game.player.avatar.look.top === window.__top0, !window.__game.gymSaved]",
+    "expect": "^\\[true,true\\]$"
+  },
+  {
+    "name": "143 gym: the treadmill works",
+    "do": "(() => { const g = window.__game, O = g.interior.O, P = g.player; P.pos.set(O.x + -1.2, O.y + 0, O.z + -5.5); P.heading = 0; P.camYaw = 0; P.vel.set(0, 0, 0); })()",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 1800,
+    "check": "window.__game.activity.cur ? window.__game.activity.cur.name : null",
+    "expect": "^\"treadmill\"$"
+  },
+  {
+    "name": "144 gym: a finished run counts",
+    "do": "(() => { window.__g0 = window.__game.progress.stats.gym || 0; window.__game.activity.cur.t = 29; })()",
+    "wait": 900,
+    "check": "(window.__game.progress.stats.gym || 0) > window.__g0",
+    "expect": "true"
+  },
+  {
+    "name": "145 hospital: the pharmacy sells medicine",
+    "do": "(async () => { const g = window.__game; g.clock.set(11); if (g.interior.active) await g.interiors.exit(0, { noScan: true }); const s = g.world.site('hospital'); await g.fastTravel(s.ex + s.nx * 3, s.ez + s.nz * 3, true); await g.interiors.enter(s.blocks[0], { noScan: true }); })().then(() => { (() => { const g = window.__game, O = g.interior.O, P = g.player; P.pos.set(O.x + 13.4, O.y + 0, O.z + 8.5); P.heading = -Math.PI / 2; P.camYaw = -Math.PI / 2; P.vel.set(0, 0, 0); })(); })",
+    "wait": 1500,
+    "check": "(() => { const c = window.__game.interact.current; return c ? (typeof c.label === 'function' ? c.label() : c.label) : null; })()",
+    "expect": "pharmacy"
+  },
+  {
+    "name": "146 hospital: E opens the pharmacy",
+    "keys": [
+      "KeyE"
+    ],
+    "wait": 500,
+    "check": "window.__game.activity.cur ? window.__game.activity.cur.name : null",
+    "expect": "^\"shop\"$"
+  },
+  {
+    "name": "147 hospital: 2 buys ORS, and it is charged",
+    "do": "window.__coins1 = window.__game.progress.coins",
+    "keys": [
+      "Digit2"
+    ],
+    "wait": 500,
+    "check": "window.__coins1 - window.__game.progress.coins",
+    "expect": "^[1-9]"
+  },
+  {
+    "name": "148 hospital: Esc, and outside again",
+    "keys": [
+      "Escape"
+    ],
+    "do": "window.__game.interiors.exit(0, { noScan: true })",
+    "wait": 1000,
+    "check": "window.__game.interior.active",
+    "expect": "false"
+  },
+  {
+    "name": "149 lawns are planted in front of the big buildings",
+    "do": "(async () => { const g = window.__game; g.ui.closeAll(); if (g.interior.active) await g.interiors.exit(0, { noScan: true }); g.activity.stop(true); g.setMode('walk'); g.clock.speedId = 'pause'; g.weather.setMode('clear'); g.weather.pick(true); g.progress.coins = 5000; g.progress.bank = 20000; })()",
+    "wait": 300,
+    "check": "window.__game.world.lawns.length",
+    "expect": "^([5-9]|\\d{2,})"
+  },
+  {
+    "name": "150 map boards stand at the gates and junctions",
+    "do": "",
+    "wait": 100,
+    "check": "window.__game.signage && window.__game.signage.spots ? window.__game.signage.spots.maps.length : -1",
+    "expect": "^([4-9]|\\d{2,})"
+  },
+  {
+    "name": "151 knockable things are scattered about",
+    "do": "",
+    "wait": 100,
+    "check": "window.__game.knock.items.length",
+    "expect": "^\\d{2,}"
+  },
+  {
+    "name": "152 OneStop: a 9-digit roll number (most students) is accepted",
+    "do": "(() => { const g = window.__game; g.ui.closeAll(); g.onestop.open('profile'); const $ = (s) => document.querySelector('#phone ' + s); $('#os-name').value = 'Test Student'; $('#os-roll').value = '214101001'; $('#os-room').value = 'B-214'; $('#os-hostel').selectedIndex = Math.max(0, [...$('#os-hostel').options].findIndex((o) => o.value === 'manas')); document.querySelector('#phone [data-a=\"save\"]').click(); })()",
+    "wait": 500,
+    "check": "[window.__game.progress.profile.roll, document.querySelector('#phone #os-err')?.textContent || '']",
+    "expect": "^\\[\"214101001\",\"\"\\]$"
+  },
+  {
+    "name": "153 OneStop: an 11-digit roll number (BSc) is accepted",
+    "do": "(() => { const g = window.__game; g.ui.closeAll(); g.onestop.open('profile'); const $ = (s) => document.querySelector('#phone ' + s); $('#os-name').value = 'Test Student'; $('#os-roll').value = '23015004512'; $('#os-room').value = 'B-214'; $('#os-hostel').selectedIndex = Math.max(0, [...$('#os-hostel').options].findIndex((o) => o.value === 'manas')); document.querySelector('#phone [data-a=\"save\"]').click(); })()",
+    "wait": 500,
+    "check": "[window.__game.progress.profile.roll, document.querySelector('#phone #os-err')?.textContent || '']",
+    "expect": "^\\[\"23015004512\",\"\"\\]$"
+  },
+  {
+    "name": "154 OneStop: a 10-digit roll number is refused, and says why",
+    "do": "(() => { const g = window.__game; g.ui.closeAll(); g.onestop.open('profile'); const $ = (s) => document.querySelector('#phone ' + s); $('#os-name').value = 'Test Student'; $('#os-roll').value = '2141010012'; $('#os-room').value = 'B-214'; $('#os-hostel').selectedIndex = Math.max(0, [...$('#os-hostel').options].findIndex((o) => o.value === 'manas')); document.querySelector('#phone [data-a=\"save\"]').click(); })()",
+    "wait": 400,
+    "check": "[window.__game.progress.profile.roll, document.querySelector('#phone #os-err')?.textContent || '']",
+    "expect": "^\\[\"23015004512\",\"[^\"]*9 digits[^\"]*11[^\"]*\"\\]$"
+  },
+  {
+    "name": "155 OneStop: close the phone",
+    "do": "window.__game.onestop.close()",
+    "wait": 300,
+    "check": "window.__game.onestop.isOpen()",
+    "expect": "false"
+  },
+  {
+    "name": "160 two-lane roads with a median and cycle lanes",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const g=window.__game,d=g.graph.edges.filter(e=>e.dual);return [d.length>=15,d.reduce((a,e)=>a+e.L,0)>3000,g.dualRoads.trees>100,g.dualRoads.shrubs>300]})()",
+    "expect": "true,true,true,true"
+  },
+  {
+    "name": "161 the View Point trail: foot only, more than 2 km, winding",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const g=window.__game,G=g.graph,h=G.edges.filter(e=>e.hill),L=h.reduce((a,e)=>a+e.L,0);return [h.length>=6,L>2000,h.every(e=>!e.car&&e.foot),G.edges.filter(e=>e.hill).every(e=>!(e.kind!=='steps'&&!e.thruB&&!e.court&&!e.gated&&!e.hill)),g.hillForest.trees>3000]})()",
+    "expect": "true,true,true,true,true"
+  },
+  {
+    "name": "162 boats only on the IITG lake",
+    "do": "",
+    "wait": 0,
+    "check": "window.__game.boats.jetties.map(j=>j.w.name).join()",
+    "expect": "\"IITG lake\""
+  },
+  {
+    "name": "163 the IITG Bus Stop: bays, buses and the tour starts there",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const g=window.__game;g.busTour.plan();return [g.busTerminus.buses.length>=3,g.busTour.stops.some(q=>/IITG Bus Stop/.test(q.name)),/IITG Bus Stop/.test(g.busTour.stops[0].name)]})()",
+    "expect": "true,true,true"
+  },
+  {
+    "name": "164 the Technology Park: buildings, plaza, one cricket ground",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const g=window.__game,W=g.world;return [W.sites.filter(s=>/Technology Park|Startup Labs|Innovation Hub/.test((s.name||'')+(s.lm||''))).length>=4,!!g.techPark.plaza,W.fields.filter(f=>f.kind==='cricket'&&!f.practice).length,Math.round(W.landmark('cricket').wx)]})()",
+    "expect": "true,true,1,\\d+"
+  },
+  {
+    "name": "165 the concert stage stands at the cricket ground",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const e=window.__game.events;return [!!e.stage,Math.hypot(e.stage.x-e.mainGround.cx,e.stage.z-e.mainGround.cz)<200]})()",
+    "expect": "true,true"
+  },
+  {
+    "name": "166 people talk: 60 talks, 60 different lines",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const t=window.__game.polish.talker,p={x:0,z:0,seed:0.5},a=new Set();for(let i=0;i<60;i++)a.add(t.say(p,'student'));return a.size})()",
+    "expect": "^(5\\d|60)$"
+  },
+  {
+    "name": "167 every hostel has a volleyball court, a basketball court and a cricket practice pitch",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const W=window.__game.world,hs=W.sites.filter(s=>s.kind==='hostel');return [hs.length,hs.every(s=>['volleyball','basketball','cricket'].every(k=>W.fields.some(f=>f.kind===k&&f.gen&&f.site===s.lm)))]})()",
+    "expect": "15,true"
+  },
+  {
+    "name": "168 the wall court by Dihing has the tall fence and a wall",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const W=window.__game.world,f=W.fields.find(q=>q.kind==='basketball'&&q.site==='dihing');return [!!f,(W.fenceOutlines||[]).some(o=>o.f===f&&o.h>3)]})()",
+    "expect": "true,true"
+  },
+  {
+    "name": "169 the facilities wing: library, gym, music room and TV room open from the hostel lobby",
+    "do": "(async()=>{const g=window.__game,s=g.world.site('manas');await g.fastTravel(s.ex+s.nx*3,s.ez+s.nz*3,true);await g.interiors.enter(s.blocks[0],{noScan:true});await g.interiors.switchTo('hostelwing');const lab=(a)=>typeof a.label==='function'?a.label():a.label;const p=g.interior.plan;window.__t169=[g.interior.kind,p.acts.some(a=>/library/i.test(lab(a))),p.acts.some(a=>/exercise bike|squats|treadmill/i.test(lab(a))),p.acts.some(a=>/music club/i.test(lab(a))),p.acts.some(a=>/Watch TV/i.test(lab(a)))];await g.interiors.exit(0,{noScan:true});})()",
+    "wait": 5000,
+    "check": "window.__t169",
+    "expect": "hostelwing.,true,true,true,true"
+  },
+  {
+    "name": "170 the wash area: a working tap (E) runs the water",
+    "do": "(async()=>{const g=window.__game,s=g.world.site('manas');await g.fastTravel(s.ex+s.nx*3,s.ez+s.nz*3,true);await g.interiors.enter(s.blocks[0],{noScan:true});const lab=(a)=>typeof a.label==='function'?a.label():a.label;const a=g.interior.plan.acts.find(q=>/Wash your hands/.test(lab(q)));const before=!!a;a.run();const after=g.interior.plan.acts.find(q=>/Turn the tap off/.test(lab(q)));a.run();window.__t170=[before,!!after];await g.interiors.exit(0,{noScan:true});})()",
+    "wait": 4500,
+    "check": "window.__t170",
+    "expect": "true,true"
+  },
+  {
+    "name": "171 the campus gates keep only a QR desk, beside the road, not on it; the Library has one too",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const g=window.__game,ks=g.onestop.kiosks;const gk=ks.filter(k=>k.kind==='campus');return [gk.length>=3,gk.every(k=>!g.graph.onRoad(k.x,k.z,0.5)),ks.some(k=>k.id==='place-library'),ks.some(k=>k.id==='place-computercentre')]})()",
+    "expect": "true,true,true,true"
+  },
+  {
+    "name": "172 the Lake Circle is a roundabout with a flower island; the board, the guard and the duck house stand round it",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const g=window.__game,W=g.world,L=W.lakeSpots;return [(W.islands||[]).some(i=>i.name==='Lake Circle'&&i.flowers),!!L&&!!L.aqi&&!!L.guard&&!!L.duck,Math.hypot(L.duck.x-L.aqi.x,L.duck.z-L.aqi.z)<20]})()",
+    "expect": "true,true,true"
+  },
+  {
+    "name": "173 the stands: tiers are walkable surfaces and the stage is at the far end",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const g=window.__game,W=g.world,st=g.courts.stands[0];const e=g.events,f=e.mainGround;const px=e.stage.x,pz=e.stage.z;const u=((px-f.cx)*f.ax+(pz-f.cz)*f.az);return [g.courts.stands.length>=3,st.seats.length>100,u>0]})()",
+    "expect": "true,true,true"
+  },
+  {
+    "name": "174 the Academic Complex stands on a podium with a flight of steps",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const g=window.__game,W=g.world,ac=W.site('academic'),b=ac.blocks.reduce((m,q)=>q.area>m.area?q:m,ac.blocks[0]);return [!!g.acFront,ac.podium>W.heightAt(ac.ex+ac.nx*14,ac.ez+ac.nz*14)+1.5,b.floor0>=ac.podium-0.01]})()",
+    "expect": "true,true,true"
+  },
+  {
+    "name": "175 Domino's Pizza and KFC stand next to each other",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const S=window.__game.stallsObj.stalls,d=S.find(s=>/Domino/.test(s.name)),k=S.find(s=>s.name==='KFC');return [!!d,!!k,!!d&&!!k&&Math.hypot(d.x-k.x,d.z-k.z)<7]})()",
+    "expect": "true,true,true"
+  },
+  {
+    "name": "176 the camera near plane follows its height (no z-fighting from the air)",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const g=window.__game,c=g.camera;return [c.near>=0.1,c.near<=14.01]})()",
+    "expect": "true,true"
+  },
+  {
+    "name": "177 both halls offer Present / share your screen at the presenter PC",
+    "do": "(async()=>{const g=window.__game,out=[];const lab=(a)=>typeof a.label==='function'?a.label():a.label;for(const id of ['auditorium','conference']){const s=g.world.site(id);await g.fastTravel(s.ex+s.nx*3,s.ez+s.nz*3,true);await g.interiors.enter(s.blocks[0],{noScan:true});out.push(g.interior.plan.acts.some(a=>/Present.*share/.test(lab(a))),typeof g.screens.present==='function');await g.interiors.exit(0,{noScan:true});}window.__t177=out;})()",
+    "wait": 6000,
+    "check": "window.__t177",
+    "expect": "true,true,true,true"
+  },
+  {
+    "name": "178 hostel graffiti: only the hostel's own name or Assam, never another hostel's name",
+    "do": "",
+    "wait": 0,
+    "check": "(()=>{const W=window.__game.world,hs=W.sites.filter(s=>s.kind==='hostel'),names=hs.map(s=>s.name.replace(' Hostel','').toUpperCase());const ms=(W.murals||[]).filter(m=>m.art==='graffiti'&&m.opts&&m.opts.name);let bad=0,culture=0;for(const m of ms){const i=names.indexOf(m.opts.name);if(i>=0){const s=hs[i];if(Math.hypot(m.cx-s.ex,m.cz-s.ez)>170)bad++;}if(m.opts.culture)culture++;}return [ms.length>20,bad,culture>=15]})()",
+    "expect": "true,0,true"
+  }
+]
