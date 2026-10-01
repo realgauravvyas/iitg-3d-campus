@@ -42,6 +42,7 @@ export const TOPICS = [
       [W, 'Your character: the creator changes your face, hair, beard, glasses, clothes, shoes and cycle; the character has eyes with lids and lashes, brows, a nose, lips, ears, hands with fingers and nails, a belt and trainers with laces', 'P'],
       [W, 'Sprint, jump, fly', 'Shift|Space|F'],
       [W, 'Your progress, look and settings are saved by themselves', null, 'In this browser. The menu can export a backup file to move them elsewhere.'],
+      [W, 'The game keeps itself smooth: if your computer cannot keep up, far trees, signs and props are drawn nearer first, and only then is the picture made a little less sharp', null, 'Menu, Display: Quality (Low, Medium, High) and Show frame rate, a small counter of frames per second, how long a frame takes and how far the detail has been cut.'],
       [N, 'Playing with other people online', null, 'Everyone else on campus is simulated.'],
       [N, 'Saving to the cloud', null, 'Use the menu’s backup if you want to carry your progress to another browser.'],
     ],

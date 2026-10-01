@@ -10,6 +10,7 @@ const CHECKS = [
   ['End-to-end play-through (steps.json)', 'run.mjs'],
   ['Every vehicle lets you out', 'vehicles.mjs'],
   ['Placement and collisions', 'placement.mjs'],
+  ['Drawing budget (draw calls and triangles)', 'perf.mjs'],
   ['People never inside buildings or water', 'npc-audit.mjs'],
 ];
 const results = [];

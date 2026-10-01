@@ -1,12 +1,11 @@
 import { sweepBlocked, footprintBlocked } from './clearance.js';
 import * as THREE from 'three';
-import { Avatar, randomLook } from './avatar.js';
-import { makeBicycle, makeScooter, makeCar, makeBus } from './models.js';
+import { makeScooter, makeCar, makeBus } from './models.js';
 import { mulberry32, damp, wrapAngle, clamp } from './util.js';
 import { makeAmbulance } from './vehicle.js';
 import { AN } from './crowd/people.js';
 import { FILTERS, laneOffset } from './route.js';
-import { adultLook, studentLook, OPT, bit } from './crowd/looks.js';
+import { adultLook, studentLook, OPT, bit, pal } from './crowd/looks.js';
 
 // Campus mix: mostly bicycles, a handful of scooters and cars, the campus shuttle, and people walking.
 // walkers and cyclists are part of campus life (GPU crowd); this handles motor vehicles
@@ -57,22 +56,19 @@ export class Traffic {
     const a = { kind, e, fwd: r() < 0.5, s: r() * e.L, v: 0, heading: 0, bellCool: r() * 5, phase: r() * 6, home };
     a.vDes = SPEED[kind][0] + r() * (SPEED[kind][1] - SPEED[kind][0]);
     const g = new THREE.Group();
+    // (a cyclist or a walker is only a moving point here: the GPU crowd draws the person, and the bicycle, in one draw call for everybody)
     if (kind === 'cyclist') {
-      a.bike = makeBicycle(BIKE_COLORS[Math.floor(r() * BIKE_COLORS.length)], r() < 0.45 ? 'roadster' : 'mtb');
-      a.rider = new Avatar(randomLook(r), { npc: true });
-      a.bike.group.add(a.rider.root);
-      g.add(a.bike.group);
+      a.bikeCol = pal(BIKE_COLORS[Math.floor(r() * BIKE_COLORS.length)]);
+      a.look = studentLook(r);
+      a.wheel = r() * 6;
       a.lane = 0.35 + r() * 0.3;
     } else if (kind === 'walker') {
-      a.rider = new Avatar(randomLook(r), { npc: true });
-      g.add(a.rider.root);
+      a.look = r() < 0.5 ? studentLook(r) : adultLook(r, r() < 0.5 ? 'staff' : 'faculty');
       a.lane = 1.0 + r() * 0.4;
       a.pauseT = 0;
     } else if (kind === 'scooter') {
       a.veh = makeScooter(SCOOTER_COLORS[Math.floor(r() * SCOOTER_COLORS.length)]);
-      a.rider = new Avatar({ ...randomLook(r), backpack: false }, { npc: true });
-      a.rider.root.position.set(0, 0, -0.15);
-      a.veh.group.add(a.rider.root);
+      a.look = studentLook(r);                   // the rider: drawn by the crowd, sitting on the scooter (see draw)
       g.add(a.veh.group);
       a.lane = 0.45;
     } else if (kind === 'car') {
@@ -219,20 +215,16 @@ export class Traffic {
       gp.set(px, y, pz);
       a.group.rotation.y = a.heading;
       const d2 = cam.position.distanceToSquared(gp);
-      a.group.visible = d2 < 420 * 420;
-      const near = d2 < 160 * 160;
+      a.group.visible = d2 < 330 * 330;
+      a.d2 = d2;
       if (a.kind === 'cyclist') {
-        a.bike.spin(a.v * dt);
-        if (near) {
-          a.bike.setCrank(a.bike.crankAngle + (a.v / a.bike.R) * dt / 2.3);
-          a.rider.animate({ type: 'bike', bike: a.bike, speed: a.v }, dt);
-        }
+        a.wheel += (a.v * dt) / 0.34;
+        a.phase = a.wheel / 2.3;                         // the crank turns with the wheel
       } else if (a.kind === 'walker') {
-        if (near) a.rider.animate({ type: a.v > 0.2 ? 'walk' : 'idle', speed: a.v }, dt);
+        a.phase += (a.v * dt / 1.35) * Math.PI * 2;      // a stride is about 1.35 m
       } else {
         a.veh.spin(a.v * dt);
         a.veh.lights?.(true, dt);
-        if (a.rider && near) a.rider.animate({ type: 'scooterRide' }, dt);
         if (!nearest || d2 < nearest.d2) nearest = { d2, a };
         a.near = d2 < 70 * 70;
         if (a.kind === 'ambulance') this.ambD2 = d2;
@@ -254,9 +246,23 @@ export class Traffic {
   positions() { return this.agents; }
 
   /** drivers and passengers, transformed with their vehicle */
-  draw(crowd) {
+  draw(crowd, bikes) {
     const v = new THREE.Vector3();
     for (const a of this.agents) {
+      // cyclists and walkers: the person (and the bicycle) from the GPU crowd, as far away as the crowd is drawn
+      if (a.kind === 'cyclist' || a.kind === 'walker') {
+        if (a.d2 > 300 * 300) continue;
+        const p = a.group.position, cy = a.kind === 'cyclist';
+        const anim = cy ? AN.BIKE : a.v > 0.2 ? AN.WALK : AN.STAND;
+        if (crowd.push({ x: p.x, y: p.y, z: p.z, yaw: a.heading, anim, phase: a.phase, speed: a.v, extra: 0, look: a.look, opts: a.look.opts }) && cy && bikes) bikes.push({ x: p.x, y: p.y, z: p.z, yaw: a.heading, wheel: a.wheel, crank: a.phase, lean: 0, color: a.bikeCol });
+        continue;
+      }
+      // the scooter rider, up to 200 m
+      if (a.kind === 'scooter' && a.look && a.group.visible && a.d2 < 200 * 200) {
+        a.group.updateMatrixWorld();
+        v.set(0, 0, -0.15).applyMatrix4(a.veh.group.matrixWorld);
+        crowd.push({ x: v.x, y: v.y, z: v.z, yaw: a.heading, anim: AN.SCOOTER, phase: 0, speed: 0, extra: 0, look: a.look, opts: a.look.opts });
+      }
       if (!a.crew?.length || !a.near || !a.group.visible) continue;
       a.group.updateMatrixWorld();
       for (const c of a.crew) {

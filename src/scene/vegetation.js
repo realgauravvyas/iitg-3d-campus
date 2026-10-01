@@ -1,5 +1,5 @@
 // Trees built from leaf cards (alpha-tested clusters on a procedural atlas) with
-// spherical canopy normals, back-lit leaves and wind. Two levels of detail per chunk.
+// spherical canopy normals, back-lit leaves and wind. Three levels of detail per chunk.
 import * as THREE from 'three';
 import { b64ToBytes, mulberry32 } from '../util.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -173,8 +173,8 @@ function leafAttr(g, v) {
   if (g.index) g = g.toNonIndexed();
   return g;
 }
-function trunk(r0, r1, h, x = 0, z = 0, lean = [0, 0], seg = 6) {
-  const g = new THREE.CylinderGeometry(r1, r0, h, seg, 2, true);
+function trunk(r0, r1, h, x = 0, z = 0, lean = [0, 0], seg = 6, hs = 1) {
+  const g = new THREE.CylinderGeometry(r1, r0, h, seg, hs, true);
   g.translate(0, h / 2, 0);
   g.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(lean[0], 0, lean[1])));
   g.translate(x, 0, z);
@@ -194,93 +194,101 @@ function crown(center, radii, count, size, cells, rnd, aspect = 1) {
   return out;
 }
 
+/** the tree shapes at three levels of detail: 0 near (full), 1 far (about a third of the leaf cards, each bigger, one plain thin trunk: a
+ *  third of the triangles) and 2 very far (a handful of big cards: a sixth). From a distance a tree is a green blob either way; the
+ *  triangles of the far forest were most of what the graphics card was asked to draw. */
 function species(lod) {
   const r = mulberry32(5 + lod);
-  const k = lod ? 0.45 : 1;   // far LOD: fewer, bigger cards
-  const sz = lod ? 1.45 : 1;
+  const k = [1, 0.3, 0.1][lod];       // the share of the leaf cards kept
+  const sz = [1, 1.65, 2.7][lod];     // ... and how much bigger each is, so the crown keeps its mass
   const S = [];
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  const n = (c) => (lod ? Math.max(2, Math.round(c * k)) : c);                                                    // cards in a crown
+  const tr = (r0, r1, h, x = 0, z = 0, lean = [0, 0], seg = 6) => (lod ? trunk(r0, r1, h, x, z, lean, lod === 1 ? 4 : 3, 1) : trunk(r0, r1, h, x, z, lean, seg));
+  const side = (...a) => (lod ? [] : [trunk(...a)]);                                                           // side branches: near trees only
+  const second = (...a) => (lod === 2 ? [] : crown(...a));                                                    // a second, smaller crown: not on the very far ones
   // 0 broadleaf (mango / jackfruit / banyan-like)
   S.push(mergeGeometries([
-    trunk(0.28, 0.18, 3.6), trunk(0.12, 0.07, 2.2, 0.2, 0, [0.2, -0.7]), trunk(0.12, 0.07, 2.2, -0.2, 0.1, [-0.3, 0.65]),
-    ...crown(V(0, 4.8, 0), [2.9, 2.0, 2.9], Math.round(46 * k), 2.1 * sz, [CELLS.broad, CELLS.broad2], r),
-    ...crown(V(1.3, 5.5, 0.6), [1.7, 1.3, 1.7], Math.round(14 * k), 1.8 * sz, [CELLS.broad], r),
+    tr(0.28, 0.18, 3.6), ...side(0.12, 0.07, 2.2, 0.2, 0, [0.2, -0.7]), ...side(0.12, 0.07, 2.2, -0.2, 0.1, [-0.3, 0.65]),
+    ...crown(V(0, 4.8, 0), [2.9, 2.0, 2.9], n(46), 2.1 * sz, [CELLS.broad, CELLS.broad2], r),
+    ...second(V(1.3, 5.5, 0.6), [1.7, 1.3, 1.7], n(14), 1.8 * sz, [CELLS.broad], r),
   ]));
   // 1 areca (betel-nut) palm
   // (the crown sits on the top of the trunk as it is actually leaning: worked out with the same rotation the trunk gets)
   const palmLean = [0.02, 0.03], palmTop = V(0, 8.8, 0).applyEuler(new THREE.Euler(palmLean[0], 0, palmLean[1]));
-  const palm = [trunk(0.13, 0.09, 8.8, 0, 0, palmLean, 5)];
-  const nf = lod ? 7 : 11;
+  const palm = [tr(0.13, 0.09, 8.8, 0, 0, palmLean, 5)];
+  const nf = [11, 6, 4][lod], fs = lod ? 1.25 : 1;
   for (let i = 0; i < nf; i++) {
-    const g = new THREE.PlaneGeometry(0.9, 3.2, 1, 3);
+    const g = new THREE.PlaneGeometry(0.9 * fs, 3.2 * fs, 1, lod ? 1 : 3);
     const pos = g.attributes.position;
-    for (let v = 0; v < pos.count; v++) { const y = pos.getY(v) + 1.6; pos.setZ(v, -y * y * 0.09); }  // droop
-    g.rotateX(-Math.PI / 2); g.translate(0, 0, 1.6);
+    if (!lod) for (let v = 0; v < pos.count; v++) { const y = pos.getY(v) + 1.6; pos.setZ(v, -y * y * 0.09); }  // droop
+    g.rotateX(-Math.PI / 2); g.translate(0, 0, 1.6 * fs);
     g.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(-0.35 - r() * 0.4, (i / nf) * Math.PI * 2 + r() * 0.3, 0, 'YXZ')));
     g.translate(palmTop.x, palmTop.y + 0.2, palmTop.z);
     const uv = g.attributes.uv;
     for (let v = 0; v < uv.count; v++) { const [u, w] = cellUV(CELLS.palm, uv.getX(v), uv.getY(v)); uv.setXY(v, u, w); }
     g.computeVertexNormals();
-    const n = g.attributes.normal;
-    for (let v = 0; v < n.count; v++) n.setXYZ(v, n.getX(v) * 0.4, 0.9, n.getZ(v) * 0.4);
+    const nn = g.attributes.normal;
+    for (let v = 0; v < nn.count; v++) nn.setXYZ(v, nn.getX(v) * 0.4, 0.9, nn.getZ(v) * 0.4);
     palm.push(leafAttr(g, 1));
   }
   S.push(mergeGeometries(palm));
   // 2 bamboo clump
   const bam = [];
-  for (let i = 0; i < (lod ? 4 : 7); i++) {
+  for (let i = 0; i < [7, 3, 2][lod]; i++) {
     const a = r() * Math.PI * 2, lean = 0.1 + r() * 0.18, h = 8 + r() * 3.5;
-    bam.push(trunk(0.06, 0.045, h, Math.cos(a) * 0.4, Math.sin(a) * 0.4, [Math.sin(a) * lean, -Math.cos(a) * lean], 5));
+    bam.push(tr(0.06, 0.045, h, Math.cos(a) * 0.4, Math.sin(a) * 0.4, [Math.sin(a) * lean, -Math.cos(a) * lean], 5));
     const top = V(Math.cos(a) * (0.4 + h * lean * 0.8), h * 0.8, Math.sin(a) * (0.4 + h * lean * 0.8));
-    bam.push(...crown(top, [1.3, 2.4, 1.3], Math.round(9 * k) + 1, 1.9 * sz, [CELLS.bamboo], r, 1.3));
+    bam.push(...crown(top, [1.3, 2.4, 1.3], lod ? [0, 3, 2][lod] : 10, 1.9 * sz, [CELLS.bamboo], r, 1.3));
   }
   S.push(mergeGeometries(bam));
   // 3 flowering gulmohar / krishnachura (flame tree): wide umbrella crown
   S.push(mergeGeometries([
-    trunk(0.26, 0.17, 3.2), trunk(0.1, 0.06, 2.4, 0.1, 0, [0, -0.9]), trunk(0.1, 0.06, 2.4, -0.1, 0, [0, 0.9]),
-    ...crown(V(0, 4.6, 0), [3.8, 1.3, 3.8], Math.round(44 * k), 2.0 * sz, [CELLS.flower, CELLS.flower, CELLS.broad2], r),
+    tr(0.26, 0.17, 3.2), ...side(0.1, 0.06, 2.4, 0.1, 0, [0, -0.9]), ...side(0.1, 0.06, 2.4, -0.1, 0, [0, 0.9]),
+    ...crown(V(0, 4.6, 0), [3.8, 1.3, 3.8], n(44), 2.0 * sz, [CELLS.flower, CELLS.flower, CELLS.broad2], r),
   ]));
   // 4 tall sal / forest tree on the campus hills
   S.push(mergeGeometries([
-    trunk(0.34, 0.2, 7.6),
-    ...crown(V(0, 9.8, 0), [2.8, 3.6, 2.8], Math.round(40 * k), 2.3 * sz, [CELLS.sal, CELLS.broad], r),
-    ...crown(V(0.8, 7.4, 0.5), [1.8, 1.4, 1.8], Math.round(10 * k), 1.8 * sz, [CELLS.sal], r),
+    tr(0.34, 0.2, 7.6),
+    ...crown(V(0, 9.8, 0), [2.8, 3.6, 2.8], n(40), 2.3 * sz, [CELLS.sal, CELLS.broad], r),
+    ...second(V(0.8, 7.4, 0.5), [1.8, 1.4, 1.8], n(10), 1.8 * sz, [CELLS.sal], r),
   ]));
   // 5 false ashoka (Polyalthia): tall, slim, conical - the rows in front of the admin building
   S.push(mergeGeometries([
-    trunk(0.16, 0.08, 10.5, 0, 0, [0, 0], 5),
-    ...crown(V(0, 6.8, 0), [1.15, 4.6, 1.15], Math.round(40 * k), 1.6 * sz, [CELLS.ashoka], r, 1.4),
-    ...crown(V(0, 10.4, 0), [0.6, 1.6, 0.6], Math.round(8 * k) + 1, 1.3 * sz, [CELLS.ashoka], r, 1.4),
+    tr(0.16, 0.08, 10.5, 0, 0, [0, 0], 5),
+    ...crown(V(0, 6.8, 0), [1.15, 4.6, 1.15], n(40), 1.6 * sz, [CELLS.ashoka], r, 1.4),
+    ...second(V(0, 10.4, 0), [0.6, 1.6, 0.6], n(8) + 1, 1.3 * sz, [CELLS.ashoka], r, 1.4),
   ]));
   // 6 coconut palm: tall curving trunk and long fronds
   const cocoLean = [0.12, 0.08];
-  const coco = [trunk(0.18, 0.13, 11.5, 0, 0, cocoLean, 6)];
+  const coco = [tr(0.18, 0.13, 11.5, 0, 0, cocoLean, 6)];
   const top6 = V(0, 11.5, 0).applyEuler(new THREE.Euler(cocoLean[0], 0, cocoLean[1]));   // where the leaning trunk really ends (the crown used to be put 3 m beside it)
   top6.y -= 0.1;
-  for (let i = 0; i < (lod ? 8 : 13); i++) {
-    const g = new THREE.PlaneGeometry(1.1, 4.6, 1, 4);
+  const nc = [13, 7, 5][lod];
+  for (let i = 0; i < nc; i++) {
+    const g = new THREE.PlaneGeometry(1.1 * fs, 4.6 * fs, 1, lod ? 1 : 4);
     const pos = g.attributes.position;
-    for (let v = 0; v < pos.count; v++) { const y = pos.getY(v) + 2.3; pos.setZ(v, -y * y * 0.07); }
-    g.rotateX(-Math.PI / 2); g.translate(0, 0, 2.3);
-    g.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(-0.15 - r() * 0.5, (i / 13) * Math.PI * 2 + r() * 0.3, 0, 'YXZ')));
+    if (!lod) for (let v = 0; v < pos.count; v++) { const y = pos.getY(v) + 2.3; pos.setZ(v, -y * y * 0.07); }
+    g.rotateX(-Math.PI / 2); g.translate(0, 0, 2.3 * fs);
+    g.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(-0.15 - r() * 0.5, (i / nc) * Math.PI * 2 + r() * 0.3, 0, 'YXZ')));
     g.translate(top6.x, top6.y, top6.z);
     const uv = g.attributes.uv;
     for (let v = 0; v < uv.count; v++) { const [u, w] = cellUV(CELLS.coconut, uv.getX(v), uv.getY(v)); uv.setXY(v, u, w); }
     g.computeVertexNormals();
-    const n = g.attributes.normal;
-    for (let v = 0; v < n.count; v++) n.setXYZ(v, n.getX(v) * 0.4, 0.9, n.getZ(v) * 0.4);
+    const nn = g.attributes.normal;
+    for (let v = 0; v < nn.count; v++) nn.setXYZ(v, nn.getX(v) * 0.4, 0.9, nn.getZ(v) * 0.4);
     coco.push(leafAttr(g, 1));
   }
   S.push(mergeGeometries(coco));
   // 7 norfolk pine (araucaria): tiers of flat branches, a perfect cone
-  const pine = [trunk(0.2, 0.08, 15, 0, 0, [0, 0], 6)];
-  const tiers = lod ? 7 : 12;
+  const pine = [tr(0.2, 0.08, 15, 0, 0, [0, 0], 6)];
+  const tiers = [12, 6, 4][lod], jn = [6, 3, 2][lod];
   for (let t = 0; t < tiers; t++) {
-    const f = t / tiers, y = 3 + f * 11.5, R = 2.8 * (1 - f) + 0.4;
-    for (let j = 0; j < (lod ? 4 : 6); j++) {
-      const g = new THREE.PlaneGeometry(R * 1.3, 0.9);
+    const f = t / tiers, y = 3 + f * 11.5, R = (2.8 * (1 - f) + 0.4) * (lod ? 1.15 : 1);
+    for (let j = 0; j < jn; j++) {
+      const g = new THREE.PlaneGeometry(R * 1.3, 0.9 * (lod ? 1.5 : 1));
       g.translate(R * 0.6, 0, 0);
-      g.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(-Math.PI / 2 + 0.25, (j / 6) * Math.PI * 2 + t * 0.5, -0.12, 'YXZ')));
+      g.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(-Math.PI / 2 + 0.25, (j / jn) * Math.PI * 2 + t * 0.5, -0.12, 'YXZ')));
       g.translate(0, y, 0);
       const uv = g.attributes.uv;
       for (let v = 0; v < uv.count; v++) { const [u, w] = cellUV(CELLS.pine, uv.getX(v), uv.getY(v)); uv.setXY(v, u, w); }
@@ -291,22 +299,23 @@ function species(lod) {
   S.push(mergeGeometries(pine));
   // 8 amaltas (golden shower)
   S.push(mergeGeometries([
-    trunk(0.22, 0.14, 3.4), trunk(0.09, 0.05, 2.2, 0.1, 0, [0.1, -0.7]),
-    ...crown(V(0, 5.0, 0), [2.8, 2.1, 2.8], Math.round(40 * k), 2.0 * sz, [CELLS.yellow, CELLS.yellow, CELLS.broad2], r),
+    tr(0.22, 0.14, 3.4), ...side(0.09, 0.05, 2.2, 0.1, 0, [0.1, -0.7]),
+    ...crown(V(0, 5.0, 0), [2.8, 2.1, 2.8], n(40), 2.0 * sz, [CELLS.yellow, CELLS.yellow, CELLS.broad2], r),
   ]));
   // 9 jarul (purple)
   S.push(mergeGeometries([
-    trunk(0.22, 0.14, 3.0), trunk(0.09, 0.05, 2.0, -0.1, 0, [-0.1, 0.7]),
-    ...crown(V(0, 4.5, 0), [2.6, 1.9, 2.6], Math.round(40 * k), 1.9 * sz, [CELLS.purple, CELLS.purple, CELLS.broad], r),
+    tr(0.22, 0.14, 3.0), ...side(0.09, 0.05, 2.0, -0.1, 0, [-0.1, 0.7]),
+    ...crown(V(0, 4.5, 0), [2.6, 1.9, 2.6], n(40), 1.9 * sz, [CELLS.purple, CELLS.purple, CELLS.broad], r),
   ]));
   // 10 banana plant
-  const ban = [trunk(0.16, 0.12, 2.1, 0, 0, [0, 0], 6)];
-  for (let i = 0; i < (lod ? 5 : 8); i++) {
-    const g = new THREE.PlaneGeometry(0.75, 2.4, 1, 4);
+  const ban = [tr(0.16, 0.12, 2.1, 0, 0, [0, 0], 6)];
+  const nb = [8, 5, 4][lod];
+  for (let i = 0; i < nb; i++) {
+    const g = new THREE.PlaneGeometry(0.75 * fs, 2.4 * fs, 1, lod ? 1 : 4);
     const pos = g.attributes.position;
-    for (let v = 0; v < pos.count; v++) { const y = pos.getY(v) + 1.2; pos.setZ(v, -y * y * 0.16); }
+    if (!lod) for (let v = 0; v < pos.count; v++) { const y = pos.getY(v) + 1.2; pos.setZ(v, -y * y * 0.16); }
     g.rotateX(-Math.PI / 2 + 0.9); g.translate(0, 0.3, 0.4);
-    g.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(0, (i / 8) * Math.PI * 2 + r() * 0.5, 0)));
+    g.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(0, (i / nb) * Math.PI * 2 + r() * 0.5, 0)));
     g.translate(0, 2.0, 0);
     const uv = g.attributes.uv;
     for (let v = 0; v < uv.count; v++) { const [u, w] = cellUV(CELLS.banana, uv.getX(v), uv.getY(v)); uv.setXY(v, u, w); }
@@ -316,13 +325,13 @@ function species(lod) {
   S.push(mergeGeometries(ban));
   // 11 neem: round, fine-leaved
   S.push(mergeGeometries([
-    trunk(0.26, 0.16, 3.8), trunk(0.1, 0.06, 2.4, 0.15, 0, [0.15, -0.6]), trunk(0.1, 0.06, 2.4, -0.15, 0.1, [-0.2, 0.6]),
-    ...crown(V(0, 5.4, 0), [3.2, 2.5, 3.2], Math.round(46 * k), 2.0 * sz, [CELLS.neem, CELLS.neem, CELLS.broad2], r),
+    tr(0.26, 0.16, 3.8), ...side(0.1, 0.06, 2.4, 0.15, 0, [0.15, -0.6]), ...side(0.1, 0.06, 2.4, -0.15, 0.1, [-0.2, 0.6]),
+    ...crown(V(0, 5.4, 0), [3.2, 2.5, 3.2], n(46), 2.0 * sz, [CELLS.neem, CELLS.neem, CELLS.broad2], r),
   ]));
   // 12 kachnar (pink orchid tree)
   S.push(mergeGeometries([
-    trunk(0.18, 0.12, 2.8),
-    ...crown(V(0, 4.1, 0), [2.3, 1.7, 2.3], Math.round(36 * k), 1.8 * sz, [CELLS.pink, CELLS.pink, CELLS.broad2], r),
+    tr(0.18, 0.12, 2.8),
+    ...crown(V(0, 4.1, 0), [2.3, 1.7, 2.3], n(36), 1.8 * sz, [CELLS.pink, CELLS.pink, CELLS.broad2], r),
   ]));
   return S;
 }
@@ -390,7 +399,7 @@ export function buildVegetation(world, quality = 'medium', graph = null) {
   const bytes = b64ToBytes(world.data.trees);
   const a = new Int16Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 2);
   const atlas = leafAtlas();
-  const near = species(0), far = species(1);
+  const levels = [species(0), species(1), species(2)];
   const sunU = { dir: { value: new THREE.Vector3(0, 1, 0) }, col: { value: new THREE.Color(1, 0.95, 0.8) } };
   const mat = new THREE.MeshStandardMaterial({ map: atlas, alphaTest: 0.42, alphaToCoverage: true, side: THREE.DoubleSide, roughness: 0.82, metalness: 0 });   // (alpha to coverage: the leaf edges are anti-aliased instead of crawling as you move)
   mat.onBeforeCompile = (sh) => patchTree(sh, sunU);
@@ -431,8 +440,8 @@ export function buildVegetation(world, quality = 'medium', graph = null) {
   for (const [key, list] of chunks) {
     const sp = +key.split(',')[2];
     const pair = [];
-    for (const geo of [near[sp], far[sp]]) {
-      const im = new THREE.InstancedMesh(geo, mat, list.length);
+    for (const L of levels) {
+      const im = new THREE.InstancedMesh(L[sp], mat, list.length);
       im.customDepthMaterial = depth;
       pair.push(im);
     }
@@ -445,33 +454,40 @@ export function buildVegetation(world, quality = 'medium', graph = null) {
       for (const im of pair) { im.setMatrixAt(i, M); im.setColorAt(i, C); }
     });
     for (const im of pair) { im.castShadow = true; im.receiveShadow = true; im.computeBoundingSphere(); group.add(im); }
-    pair[1].castShadow = false;
+    pair[1].castShadow = false; pair[2].castShadow = false;
+    pair[1].visible = false; pair[2].visible = false;
     const [cx, cz] = key.split(',').map(Number);
-    lods.push({ near: pair[0], far: pair[1], x: (cx + 0.5) * CH, z: (cz + 0.5) * CH, isNear: false });
+    lods.push({ m: pair, x: (cx + 0.5) * CH, z: (cz + 0.5) * CH, lvl: 0 });
   }
-  const nearDist = quality === 'high' ? 320 : quality === 'low' ? 170 : 210;
+  const nearDist = quality === 'high' ? 260 : quality === 'low' ? 120 : 150;      // (a tree further than this is a green shape: it does not need sixty leaf cards)
+  const farDist = quality === 'high' ? 650 : quality === 'low' ? 300 : 420;        // beyond this the trees are only a handful of big cards
   const shadowDist = quality === 'high' ? 170 : 120;                 // only the trees close to you cast shadows
-  let lodT = 0;
+  let lodT = 0, lodFirst = true;
   return {
     dropped,
     group,
     count: a.length / 3,
     positions,
     sunU,
+    bias: 1,                // 1 normally; the game lowers it on a machine that cannot keep up (the distances shrink with it)
     update(t, camera, sky) {
       if (sky) { sunU.dir.value.copy(sky.state.sunDir); sunU.col.value.copy(sky.sun.color).multiplyScalar(sky.sun.intensity * 0.35); }
       lodT -= 1;
       if (lodT > 0 || !camera) return;
       lodT = 15;
       const c = camera.position;
+      const dn = nearDist * this.bias, df = farDist * this.bias;
       for (const l of lods) {
         const d = Math.hypot(l.x - c.x, l.z - c.z) - CH * 0.7 + Math.max(0, c.y - 40) * 1.4;      // from the air everything is far
         // a chunk changes level only when it is clearly past the line (no flipping back and forth as the camera drifts)
-        const n = l.isNear ? d < nearDist + 45 : d < nearDist - 45;
-        l.isNear = n;
-        l.near.visible = n; l.far.visible = !n;
-        l.near.castShadow = d < shadowDist;
+        let w = l.lvl;
+        if (w === 0) { if (d > dn + 45) w = d > df + 60 ? 2 : 1; }
+        else if (w === 1) { if (d < dn - 45) w = 0; else if (d > df + 60) w = 2; }
+        else if (d < df - 60) w = d < dn - 45 ? 0 : 1;
+        if (w !== l.lvl || lodFirst) { l.lvl = w; l.m[0].visible = w === 0; l.m[1].visible = w === 1; l.m[2].visible = w === 2; }
+        l.m[0].castShadow = d < shadowDist;
       }
+      lodFirst = false;
     },
   };
 }

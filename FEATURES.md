@@ -3,7 +3,7 @@
 Every place, thing and system in the game, what you can do there, and what works only in part or not at all.
 This file is generated from the in-game catalogue (`src/guide/data.js`): press **F1** in the game for the same guide, searchable, and **I** for the entry of whatever you are near.
 
-**254** features work · **26** work in part · **33** are not in the game (73 entries).
+**255** features work · **26** work in part · **33** are not in the game (73 entries).
 
 | Symbol | Meaning |
 |---|---|
@@ -47,6 +47,7 @@ Walk out of your hostel and explore. Everything you can use shows a key next to 
 | ✅ | Your character: the creator changes your face, hair, beard, glasses, clothes, shoes and cycle; the character has eyes with lids and lashes, brows, a nose, lips, ears, hands with fingers and nails, a belt and trainers with laces | `P` |  |
 | ✅ | Sprint, jump, fly | `Shift` `Space` `F` |  |
 | ✅ | Your progress, look and settings are saved by themselves |  | In this browser. The menu can export a backup file to move them elsewhere. |
+| ✅ | The game keeps itself smooth: if your computer cannot keep up, far trees, signs and props are drawn nearer first, and only then is the picture made a little less sharp |  | Menu, Display: Quality (Low, Medium, High) and Show frame rate, a small counter of frames per second, how long a frame takes and how far the detail has been cut. |
 | ❌ | Playing with other people online |  | Everyone else on campus is simulated. |
 | ❌ | Saving to the cloud |  | Use the menu’s backup if you want to carry your progress to another browser. |
 

@@ -8,6 +8,7 @@ import { planHillForest, buildHillTrail } from './scene/hilltrail.js';
 import { buildTechPark, buildBusTerminus } from './scene/techpark.js';
 import { buildWater } from './scene/water.js';
 import { buildVegetation } from './scene/vegetation.js';
+import { DrawDist } from './scene/drawdist.js';
 import { buildProps } from './scene/props.js';
 import { buildSky, TIME_PRESETS, formatTime } from './scene/sky.js';
 import { RoadGraph, FILTERS } from './route.js';
@@ -352,6 +353,13 @@ class Game {
     this.bindUI();
     this.bindBikes();
 
+    await step(0.97, 'Getting the graphics ready…');
+    this.prewarm();
+    // what never moves does not need its matrices worked out again every frame (about four thousand objects: the trees alone are eighteen hundred)
+    this.scene.updateMatrixWorld(true);
+    for (const c of this.scene.children) if (['trees', 'buildings', 'roads', 'dual-roads', 'terrain', 'outside', 'lawn-shrubs', 'lakeside', 'islands'].includes(c.name)) c.traverse((o) => { o.matrixAutoUpdate = false; });
+    this.drawDist = new DrawDist(this.scene);               // small static things beyond their distance are not drawn (a few hundred draw calls in the open)
+
     const roadKm = DATA.roads.reduce((s, r) => s + r.pts.reduce((a, p, i) => (i ? a + Math.hypot(p[0] - r.pts[i - 1][0], p[1] - r.pts[i - 1][1]) : 0), 0), 0) / 1000;
     this.ui.ready([
       [DATA.meta.areaHa, 'hectares'], [this.world.buildings.length, 'buildings'], [(this.veg.count / 1000).toFixed(1) + 'k', 'trees'], [this.life.people.length + this.street.people.length, 'people'],
@@ -369,17 +377,47 @@ class Game {
     if (mb) mb.onclick = (e) => { e.stopPropagation(); this.audio.start(); if (this.music.theme === 'title') { this.music.play(null); mb.textContent = '♪ Title music'; } else { this.music.play('title'); mb.textContent = '♪ Music on'; } };
   }
 
+  /** the frame-rate counter of the Display settings: every half second, frames per second, the average and worst frame time, and how far the detail has been cut */
+  fpsMeter(raw) {
+    const on = !!this.progress.settings.fps;
+    if (on !== this._fpsOn) { this._fpsOn = on; this.ui.fpsText(on ? 'measuring…' : null); }
+    if (!on || raw > 1000) return;
+    this._fpsN = (this._fpsN || 0) + 1; this._fpsT = (this._fpsT || 0) + raw; this._fpsMax = Math.max(this._fpsMax || 0, raw);
+    if (this._fpsT < 500) return;
+    const ms = this._fpsT / this._fpsN;
+    this.ui.fpsText(`${Math.round(1000 / ms)} fps · ${ms.toFixed(1)} ms a frame · worst ${Math.round(this._fpsMax)} ms · detail ${Math.round((this.geoScale ?? 1) * 100)}% · sharpness ${Math.round((this.resScale ?? 1) * 100)}%`);
+    this._fpsN = this._fpsT = this._fpsMax = 0;
+  }
+
+  /** draw everything once, with everything switched on, behind the loading screen: every shader is compiled and every buffer is uploaded now, so
+   *  nothing hitches the first time it comes into view (a new shader compiling used to cost 40 ms in the middle of a walk) */
+  prewarm() {
+    const saved = [];
+    try {
+      this.scene.traverse((o) => { if (o.isMesh || o.isLine || o.isPoints) { saved.push([o, o.visible, o.frustumCulled, o.layers.mask]); o.visible = true; o.frustumCulled = false; o.layers.mask = 1; } });
+      this.camera.position.set(this.player.pos.x, this.player.pos.y + 3, this.player.pos.z);
+      this.camera.updateMatrixWorld();
+      this.postfx.render(0);
+    } catch (e) { console.warn('prewarm', e); }
+    finally { for (const [o, v, f, m] of saved) { o.visible = v; o.frustumCulled = f; o.layers.mask = m; } }
+  }
+
   /** the render resolution follows the machine: if the frames keep coming in slower than ~45 fps the picture is drawn at a lower
    *  resolution (down to 55 %) so the frame rate stays even instead of stuttering; it never climbs back past the level that was too much */
   adaptRes(raw) {
     if (raw > 120 || !this.postfx || this.mode === 'loading') return;                    // a hitch (loading, a tab switch) is not a measurement
     this._ema = (this._ema ?? 16.7) * 0.96 + raw * 0.04;
     this._adaptT = (this._adaptT || 0) + raw;
-    if (this._adaptT < 2500) return;
+    const slow = this._ema > 33;                       // far too slow: react faster and in bigger steps
+    if (this._adaptT < (slow ? 1200 : 2500)) return;
     this._adaptT = 0;
-    const s = this.resScale ?? 1, ceil = this.resCeil ?? 1;
-    if (this._ema > 22 && s > 0.55) { this.resCeil = Math.min(ceil, +(s * 0.93).toFixed(3)); this.resScale = Math.max(0.55, +(s * 0.86).toFixed(3)); this._calm = 0; this.resize(); }
-    else if (this._ema < 17.4 && s < ceil) { if (++this._calm >= 12) { this._calm = 0; this.resScale = Math.min(ceil, +(s * 1.08).toFixed(3)); this.resize(); } }
+    const s = this.resScale ?? 1, ceil = this.resCeil ?? 1, geo = this.geoScale ?? 1;
+    const setGeo = (v) => { this.geoScale = +v.toFixed(3); if (this.veg) this.veg.bias = this.geoScale; if (this.drawDist) this.drawDist.bias = this.geoScale; };
+    if (this._ema > 22 && geo > 0.55) { setGeo(Math.max(0.55, geo * (slow ? 0.8 : 0.88))); this._calm = 0; }                       // draw things nearer first: nobody sees the difference
+    else if (this._ema > 22 && s > 0.55) { this.resCeil = Math.min(ceil, +(s * 0.93).toFixed(3)); this.resScale = Math.max(0.55, +(s * 0.86).toFixed(3)); this._calm = 0; this.resize(); }
+    else if (this._ema < 17.4 && (s < ceil || geo < 1)) {
+      if (++this._calm >= 12) { this._calm = 0; if (s < ceil) { this.resScale = Math.min(ceil, +(s * 1.08).toFixed(3)); this.resize(); } else setGeo(Math.min(1, geo * 1.1)); }
+    }
     else this._calm = 0;
   }
 
@@ -763,6 +801,7 @@ class Game {
     const now = performance.now();
     const dt = Math.min(0.05, (now - this.last) / 1000);
     this.adaptRes(now - this.last);
+    this.fpsMeter(now - this.last);
     this.last = now;
     this.time += dt;
     const overlay = this.ui.anyOpen() && this.mode !== 'custom';
@@ -792,6 +831,7 @@ class Game {
     this.water.update(dt);
     this.splash.update(dt);
     this.veg.update(this.time, this.camera, this.sky);
+    this.drawDist.update(this.camera);
     if (this.grass) {
       const p = this.player.pos;
       this.grass.update(this.camera, { x: p.x, z: p.z, r: this.mode === 'bike' ? 1.3 : 0.8 }, inside ? -1e6 : this.world.heightAt(this.camera.position.x, this.camera.position.z));
@@ -841,7 +881,7 @@ class Game {
       this.bungalow.draw(this.crowd);
       this.events.draw(this.crowd);
       this.jobs.draw(this.crowd);
-      this.traffic.draw(this.crowd);
+      this.traffic.draw(this.crowd, this.bikesR);
       this.busTour.drawPeople?.(this.crowd);
     } else this.interior.drawPeople(this.crowd);
     this.crowd.end();

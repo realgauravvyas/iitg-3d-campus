@@ -347,7 +347,7 @@ export class Transport {
       v.model.group.rotation.y = v.yaw;
       v.model.spin?.(v.v * dt);
       const cam = g.camera.position;
-      v.model.group.visible = (x - cam.x) ** 2 + (z - cam.z) ** 2 < 500 * 500;
+      v.model.group.visible = (x - cam.x) ** 2 + (z - cam.z) ** 2 < 330 * 330;                  // (a vehicle 330 m away is a few pixels)
     }
     if (this.ride) this.updateRide(dt);
   }

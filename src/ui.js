@@ -127,6 +127,14 @@ export class UI {
     $('c-chai').textContent = `${hs.filter((l) => p.discovered.has(l.id)).length}/${hs.length}`;
   }
 
+  /** the frame-rate counter (Display settings); null hides it */
+  fpsText(text) {
+    const el = $('fps');
+    if (text == null) { el.hidden = true; return; }
+    el.hidden = false;
+    if (el.textContent !== text) el.textContent = text;
+  }
+
   /** the Get off / Get out button in a vehicle (the E key does the same); no label hides it */
   getOutButton(label) {
     const b = $('getout');

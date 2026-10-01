@@ -90,7 +90,8 @@ const PANES = {
     const S = S_OF(g);
     return `<p class="lede">Change how the game looks and feels. Graphics changes reload the view.</p>`
       + card('Graphics', '', row('Quality', 'Low turns shadows off. High draws more far away.', seg('quality', [['low', 'Low'], ['medium', 'Medium'], ['high', 'High']], S.quality || 'medium')),
-        row('Field of view', 'How wide the camera sees.', slider('fov', S.fov || 62, 50, 90, 1, `${S.fov || 62}°`)))
+        row('Field of view', 'How wide the camera sees.', slider('fov', S.fov || 62, 50, 90, 1, `${S.fov || 62}°`)),
+        row('Show frame rate', 'A small counter: frames per second, how long a frame takes, and how far the game has had to cut the detail to keep up with your computer.', swtch('fps', !!S.fps)))
       + card('Comfort and accessibility', '', row('Text size', 'Scales the on-screen panels and menus.', seg('uiscale', [[0.9, 'Small'], [1, 'Normal'], [1.15, 'Large'], [1.3, 'Extra large']], S.uiScale || 1)),
         row('Colour-blind friendly markers', 'Map markers use shapes as well as colours.', swtch('cb', !!S.cb)), row('High contrast', 'Solid black panels with white text.', swtch('hc', !!S.hc)),
         row('Reduce motion', 'Calmer screen effects.', swtch('calm', !!S.calm)), row('Key hints on screen', 'The list of keys in the corner (H).', swtch('hints', g.ui.keysVisible)));
@@ -153,6 +154,7 @@ function wire(pane, ui, g) {
     hc: (on) => { S.hc = on; save(); ui.applyAccess(); },
     calm: (on) => { S.calm = on; save(); ui.applyAccess(); },
     hints: (on) => { if (on !== ui.keysVisible) ui.toggleKeys(); },
+    fps: (on) => { S.fps = on; save(); },
   };
   pane.querySelectorAll('[data-sw]').forEach((el) => (el.onchange = () => { SW[el.dataset.sw]?.(el.checked); }));
   const SL = {

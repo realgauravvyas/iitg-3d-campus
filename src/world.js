@@ -93,9 +93,22 @@ export class World {
 
   /** the sports ground (cricket, football, hockey, athletics, courts) that contains a point, or null: those are for people on foot */
   sportsAt(x, z) {
-    for (const f of this.fields) {
-      if (!SPORTS.has(f.kind)) continue;
-      if (!f.bb) { let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity; for (let k = 0; k < f.ring.length; k += 2) { x0 = Math.min(x0, f.ring[k]); x1 = Math.max(x1, f.ring[k]); z0 = Math.min(z0, f.ring[k + 1]); z1 = Math.max(z1, f.ring[k + 1]); } f.bb = [x0, x1, z0, z1]; }
+    // the sports grounds are looked up in a grid of 32 m cells (every bicycle, vehicle and guide check asks, many times a frame; there are hundreds of grounds)
+    if (!this._spGrid || this._spN !== this.fields.length) {
+      const grid = new Map(), C = 32;
+      for (const f of this.fields) {
+        if (!SPORTS.has(f.kind)) continue;
+        if (!f.bb) { let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity; for (let k = 0; k < f.ring.length; k += 2) { x0 = Math.min(x0, f.ring[k]); x1 = Math.max(x1, f.ring[k]); z0 = Math.min(z0, f.ring[k + 1]); z1 = Math.max(z1, f.ring[k + 1]); } f.bb = [x0, x1, z0, z1]; }
+        for (let i = Math.floor(f.bb[0] / C); i <= Math.floor(f.bb[1] / C); i++) for (let j = Math.floor(f.bb[2] / C); j <= Math.floor(f.bb[3] / C); j++) {
+          const key = i * 100003 + j;
+          if (!grid.has(key)) grid.set(key, []);
+          grid.get(key).push(f);
+        }
+      }
+      this._spGrid = grid; this._spN = this.fields.length;
+    }
+    const list = this._spGrid.get(Math.floor(x / 32) * 100003 + Math.floor(z / 32));
+    if (list) for (const f of list) {
       if (x < f.bb[0] || x > f.bb[1] || z < f.bb[2] || z > f.bb[3]) continue;
       if (pointInRing(x, z, f.ring)) return f;
     }
