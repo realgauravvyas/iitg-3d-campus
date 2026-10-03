@@ -28,6 +28,28 @@ You need a browser with WebGL 2 and a reasonable graphics card (a laptop GPU is 
 
 **Not sure what to do?** Press **F1** for the Game Guide, or **I** anywhere for what the building or thing you are near has and what works.
 
+### The online copy and your own copy: what works where
+
+| | Online copy (the claude.ai link) | On your computer |
+|---|---|---|
+| Walking, cycling, the bus, the drone, boats, rides | yes | yes |
+| Hostels, the mess, OneStop, the gates, jobs, events, weather, music | yes (click once to start the sound) | yes |
+| Films on the auditorium and Conference Centre screens | **no** | yes, with `launch.bat` |
+| YouTube and real websites on the in-game PCs | **no** | yes, with `launch.bat` |
+| Present / share screen at the presenter PC | probably not (the page may block screen sharing) | yes, in Chrome or Edge |
+| Works offline | no | yes |
+| Your progress | saved in that browser | saved in the browser you opened it in |
+
+Opening `dist/IITG_Campus_3D.html` as a plain file gives the same as the online copy (no films, YouTube or websites) but works offline. The online copy, `launch.bat` and the plain file each keep their own save: to move your progress, use **Menu, Progress and backup, Export backup** in one and **Import backup** in the other.
+
+### If it is not smooth
+
+The game keeps itself smooth: on a slower computer it first draws far trees, signs and props nearer, and only then makes the picture a little less sharp. Turn on **Menu, Display, Show frame rate** to see the frames per second, the time a frame takes and how far the detail has been cut. If it is slow: pick **Low** quality in the same place; close other tabs; and on a laptop with two graphics chips (Intel and NVIDIA or AMD) make sure the browser uses the strong one (Windows Settings, System, Display, Graphics, add your browser, High performance), because the browser often runs on the weak one.
+
+### Getting out of vehicles
+
+Press **E** or the **Get off / Get out** button on the screen. A car or scooter brakes to a stop and lets you out even if you hold the throttle; the e-rickshaw, buggy, auto or taxi you have just left will not pick you up again for a few seconds; in the middle of the lake **E** swims you ashore.
+
 ## What is in it
 
 <table>
@@ -62,6 +84,33 @@ And more: row a boat on the IITG lake (the only lake with boats); change into gy
 **The campus, as it looks now.** The main roads where there is room are two-lane roads with a flowered median and a green cycle lane on each side. The Main Gate (with a small brick guard post), the KV Gate (a brown IITG signboard, a cement guard post that was 3D printed, the IIT sub post office built on to its wall; it stands where the road from the circle by the school meets the PWD Road) and the Khokha Gate (two big steel gates of one size, a boundary wall, a gravel path lined with cycles, and the Khokha Chai and Khokha Noodles stalls just outside) are modelled on photographs of the real ones; each has a QR desk beside the road and nothing else. The **IITG Bus Stop** is the terminus every campus bus starts from, next to the **Technology Park** that replaced the east cricket ground. The View Point is on top of the hill at the end of a winding forest trail more than two kilometres long, for people on foot only. The Director's Bungalow is a grand walled house with a fountain, fruit trees and a pool: ask for an appointment at its guard post. The academic lake is fenced and ringed with trees, with benches you can sit on, and the circle beside it is a flower roundabout with the air-quality board, a guard, a bus stop and the duck house. The Academic Complex stands on a podium with a broad flight of stone steps, a portico and a glass entrance bay. The swimming pool is a standard 25 m × 12.5 m pool. Every hostel has a library, a gym, a music room and a TV room on a floor of its own, a wash area with working taps, and its own volleyball court, basketball court and cricket pitch; Domino's Pizza and KFC stand side by side by the Brahmaputra Hostel. Graffiti covers many walls in several styles (a hostel's own walls carry its name and Assam: gamosa, japi, Bihu), and one graffiti wall follows the event that is running. Everyone you talk to has more than a hundred things to say.
 
 Everything the game can do, with what works and what does not, is in **[FEATURES.md](FEATURES.md)**, generated from the same catalogue as the in-game guide.
+
+## Gallery
+
+<table>
+<tr>
+<td width="50%"><img src="docs/images/gallery/02_you_golden_hour.jpg" alt="The character (the author) on the road in from the Main Gate, at golden hour"><br><sub>The character (the author) on the road in from the Main Gate, at golden hour</sub></td>
+<td width="50%"><img src="docs/images/gallery/03_you_cycling.jpg" alt="Cycling by the IITG lake: the weather and the time of day change as you play"><br><sub>Cycling by the IITG lake: the weather and the time of day change as you play</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/images/gallery/04_whole_campus_morning.jpg" alt="The whole campus from the air, with the Brahmaputra beyond"><br><sub>The whole campus from the air, with the Brahmaputra beyond</sub></td>
+<td width="50%"><img src="docs/images/gallery/05_hostels_at_night.jpg" alt="The hostel quadrangles at night"><br><sub>The hostel quadrangles at night</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/images/gallery/06_lake_sunset.jpg" alt="The IITG lake and the buildings round it"><br><sub>The IITG lake and the buildings round it</sub></td>
+<td width="50%"><img src="docs/images/gallery/07_academic_complex.jpg" alt="The Academic Complex"><br><sub>The Academic Complex</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/images/gallery/08_athletics_and_stands.jpg" alt="The athletics ground with its stands and the courts beside it"><br><sub>The athletics ground with its stands and the courts beside it</sub></td>
+<td width="50%"><img src="docs/images/gallery/09_swimming_pool.jpg" alt="The swimming pool compound (a standard 25 m by 12.5 m pool)"><br><sub>The swimming pool compound (a standard 25 m by 12.5 m pool)</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/images/gallery/10_kv_gate.jpg" alt="The KV (Lothia Baghicha) Gate with its 3D-printed guard post, map board and sub post office"><br><sub>The KV (Lothia Baghicha) Gate with its 3D-printed guard post, map board and sub post office</sub></td>
+<td width="50%"><img src="docs/images/gallery/11_view_from_the_hill.jpg" alt="The view from the hill"><br><sub>The view from the hill</sub></td>
+</tr>
+</table>
+
+The character in these pictures is the game's default look with the author's name. You make your own in the game (press **P**).
 
 ## Controls
 
